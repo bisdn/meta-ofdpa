@@ -1,0 +1,42 @@
+.\" Manpage for client_port_table_dump.
+.\" Contact pierluigi.greto@bisdn.de to correct errors or typos.
+.TH man 8 "23 January 2019" "1.0" "client_port_table_dump man page"
+.SH NAME
+client_port_table_dump \- prints entries in the OF-DPA port table
+.SH SYNOPSIS
+.B client_port_table_dump
+[\fI\,OPTION\/\fR]...[\fI\portNum\/\fR]
+.SH DESCRIPTION
+.PP
+Prints entries in the OF-DPA port table. Optionally limit output to a specific port type or to a specific port ID. If no option or argument given, all port entries are printed. Specifying a specific port ID takes precedence over port type. Optionally print port statistics and port queue statistics as appropriate
+for port type.
+.TP
+\fB\-o\fR, \fB\-\--oam_protect\fR
+print OAM liveness logical port entries
+.TP
+\fB\-p\fR, \fB\-\--physical\fR
+print physical port entries
+.TP
+\fB\-q\fR, \fB\-\--queue_stats\fR
+print queue statistics for physical port entries
+.TP
+\fB\-s\fR, \fB\-\--stats\fR
+print statistics for port entries
+.TP
+\fB\-t\fR, \fB\-\--tunnel\fR
+print overlay logical port entries
+.TP
+\fB\-?\fR, \fB\--help\fR
+display help and exit
+.TP
+\fB\--usage\fR
+give a short usage message
+.TP
+\fB\-V\fR, \fB\--version\fR
+output version information and exit
+.SH SEE ALSO
+client_cfg_purge(1), client_classcolortable_dump(1), client_debugcomp(1), client_debuglvl(1), client_drivshell(1), client_event(1), client_flowtable_dump(1), client_grouptable_dump(1), client_mirror_port_dump(1), client_oam_dump(1), client_tunnel_dump(1)
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Man page originally written by Pierluigi Greto <pierluigi.greto@bisdn.de>.

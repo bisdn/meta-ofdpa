@@ -1,0 +1,63 @@
+From 99acd006884ea66a5f0e420a6239e663684d95f8 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 14 Dec 2020 15:54:54 +0100
+Subject: [PATCH 3/3] linux-kernel-bde: update API usage for 5.10
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ systems/bde/linux/include/linux_dma.h          | 2 +-
+ systems/bde/linux/kernel/linux_dma.c           | 4 ++--
+ systems/bde/linux/user/kernel/linux-user-bde.c | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/systems/bde/linux/include/linux_dma.h b/systems/bde/linux/include/linux_dma.h
+index 858835307..24f046684 100755
+--- a/systems/bde/linux/include/linux_dma.h
++++ b/systems/bde/linux/include/linux_dma.h
+@@ -23,7 +23,7 @@
+ /* ioremap is broken in kernel */
+ #define IOREMAP(addr, size) ((void *)KSEG1ADDR(addr))
+ #else
+-#define IOREMAP(addr, size) ioremap_nocache(addr, size)
++#define IOREMAP(addr, size) ioremap(addr, size)
+ #endif
+ 
+ #if defined (__mips__)
+diff --git a/systems/bde/linux/kernel/linux_dma.c b/systems/bde/linux/kernel/linux_dma.c
+index a741ef15c..4581218d1 100644
+--- a/systems/bde/linux/kernel/linux_dma.c
++++ b/systems/bde/linux/kernel/linux_dma.c
+@@ -1120,7 +1120,7 @@ _sinval(int d, void *ptr, int length)
+ #if defined(dma_cache_wback_inv)
+      dma_cache_wback_inv((unsigned long)ptr, length);
+ #else
+-#if defined(IPROC_CMICD) || defined(BCM958525)
++#if defined(IPROC_CMICD) || defined(BCM958525) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
+     
+     dma_sync_single_for_cpu(NULL, (unsigned long)ptr, length, DMA_BIDIRECTIONAL);
+ #else
+@@ -1136,7 +1136,7 @@ _sflush(int d, void *ptr, int length)
+ #if defined(dma_cache_wback_inv)
+     dma_cache_wback_inv((unsigned long)ptr, length);
+ #else
+-#if defined(IPROC_CMICD) || defined(BCM958525)
++#if defined(IPROC_CMICD) || defined(BCM958525) || (LINUX_VERSION_CODE >= KERNEL_VERSION(5,10,0))
+     
+     dma_sync_single_for_cpu(NULL, (unsigned long)ptr, length, DMA_BIDIRECTIONAL);
+ #else
+diff --git a/systems/bde/linux/user/kernel/linux-user-bde.c b/systems/bde/linux/user/kernel/linux-user-bde.c
+index 2434332ca..416c5f43d 100644
+--- a/systems/bde/linux/user/kernel/linux-user-bde.c
++++ b/systems/bde/linux/user/kernel/linux-user-bde.c
+@@ -118,7 +118,7 @@ MODULE_LICENSE("GPL");
+ #define HX5_INTC_INTR_STATUS_BASE          (HX5_INTC_INTR_STATUS_REG0)
+ #define HX5_INTC_INTR_RAW_STATUS_BASE      (HX5_INTC_INTR_RAW_STATUS_REG0)
+ 
+-#define IOREMAP(addr, size)                ioremap_nocache(addr, size)
++#define IOREMAP(addr, size)                ioremap(addr, size)
+ 
+ #define HX5_IHOST_GICD_ISENABLERN_0        (0x10781100)
+ #define HX5_IHOST_GICD_ISENABLERN_1        (0x10781104)
+-- 
+2.30.0
+

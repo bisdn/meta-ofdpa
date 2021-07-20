@@ -1,0 +1,32 @@
+.\" Manpage for client_classcolortable_dump.
+.\" Contact pierluigi.greto@bisdn.de to correct errors or typos.
+.TH man 8 "23 January 2019" "1.0" "client_classcolortable_dump man page"
+.SH NAME
+client_classcolortable_dump \- prints entries in the OF-DPA Class and Counter Based tables
+.SH SYNOPSIS
+.B client_classcolortable_dump
+[\fI\,OPTION\/\fR]
+.SH DESCRIPTION
+.PP
+Prints entries in the OF-DPA Class and Counter Based tables
+.TP
+\fB\-c COUNT\fR, \fB\-\--count=COUNT\fR
+number of entries to display. If not specified or set to 0, all entries are displayed
+.TP
+\fB\-t COUNTERTABLE\fR, \fB\-\--table=COUNTERTABLE\fR
+counter (class or color) table to list. If not specified, both tables are displayed
+.TP
+\fB\-?\fR, \fB\--help\fR
+display help and exit
+.TP
+\fB\--usage\fR
+give a short usage message
+.TP
+\fB\-V\fR, \fB\--version\fR
+output version information and exit
+.SH SEE ALSO
+client_cfg_purge(1), client_debugcomp(1), client_debuglvl(1), client_drivshell(1), client_event(1), client_flowtable_dump(1), client_grouptable_dump(1), client_mirror_port_dump(1), client_oam_dump(1), client_port_table_dump(1), client_tunnel_dump(1)
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Man page originally written by Pierluigi Greto <pierluigi.greto@bisdn.de>.

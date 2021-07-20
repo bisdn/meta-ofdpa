@@ -1,0 +1,23 @@
+.\" Manpage for client_event.
+.\" Contact pierluigi.greto@bisdn.de to correct errors or typos.
+.TH man 8 "23 January 2019" "1.0" "client_event man page"
+.SH NAME
+client_event \- wait for events notification
+.SH SYNOPSIS
+.B client_event
+[\fI\,seconds\/\fR]
+.SH DESCRIPTION
+.PP
+wait for events notification. argv[1] - how long to block on receive, in seconds. -1 to block forever.
+.TP
+\fB\-h\fR, \fB\--help\fR
+display help and exit
+.TP
+\fB\--usage\fR
+give a short usage message
+.SH SEE ALSO
+client_cfg_purge(1), client_classcolortable_dump(1), client_debugcomp(1), client_debuglvl(1), client_drivshell(1), client_flowtable_dump(1), client_grouptable_dump(1), client_mirror_port_dump(1), client_oam_dump(1), client_port_table_dump(1), client_tunnel_dump(1)
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Man page originally written by Pierluigi Greto <pierluigi.greto@bisdn.de>.
