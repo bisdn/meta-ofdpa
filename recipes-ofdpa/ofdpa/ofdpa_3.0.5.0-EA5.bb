@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 # Include SDK version, and OF-DPA and OpenBCM source revisions in version
 PV = "3.0.5.0-EA5+sdk-${SDK_VERSION}+gitAUTOINC+${@'${SRCREV_ofdpa}'[:10]}_${@'${SRCREV_sdk}'[:10]}"
 
-PR = "r0.9"
+PR = "r2"
 SDK_VERSION = "6.5.22"
 SRCREV_ofdpa = "107e9030d97c1139631066882b4523cfab4a5bed"
 SRCREV_sdk = "f01ceb9cf4238b762cc4422e7ebe1c38a113464e"
