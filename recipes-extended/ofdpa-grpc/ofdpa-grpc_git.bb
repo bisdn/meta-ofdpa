@@ -1,11 +1,14 @@
 LICENSE = "CLOSED"
 
 # Nightly packages are regenerated regularily
-BB_STRICT_CHECKSUM = "0"
+BB_STRICT_CHECKSUM = "1"
 
 SRC_URI = " \
- http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/pub/onie/${MACHINE}/packages-v${DISTRO_VERSION}/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P};;sha256sum=${@d.getVarFlag('SHA256SUM', '${PACKAGE_ARCH}', 1)} \
 "
+
+SHA256SUM[cortexa9-vfp] = "9578f89c0277cad0b2ef1a73d1db4a2d76a88cf624e4ce6b922ff0f5205230bd"
+SHA256SUM[corei7-64] = "7f540d4289944ea324c8218c6537200449ececef80f9906607156fb8b772b475"
 
 # Manually calculate expanded ${SRCPV} value
 PV = "0.3+gitAUTOINC+${@'${SRCREV}'[0:10]}"
