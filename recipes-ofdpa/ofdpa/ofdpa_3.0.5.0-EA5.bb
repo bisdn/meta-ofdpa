@@ -1,7 +1,13 @@
 DESCRIPTION = ""
 LICENSE = "CLOSED"
 
+# Include SDK version, and OF-DPA and OpenBCM source revisions in version
+PV = "3.0.5.0-EA5+sdk-${SDK_VERSION}+gitAUTOINC+${@'${SRCREV_ofdpa}'[:10]}_${@'${SRCREV_sdk}'[:10]}"
+
 PR = "r0.9"
+SDK_VERSION = "6.5.22"
+SRCREV_ofdpa = "02b35c76444ed1d77b326c8f7118ce3d176230fe"
+SRCREV_sdk = "f01ceb9cf4238b762cc4422e7ebe1c38a113464e"
 
 DEPENDS = "python3 onl"
 RDEPENDS_${PN} += "libgcc udev openbcm-gpl-modules"
@@ -12,10 +18,10 @@ RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${
 BB_STRICT_CHECKSUM = "0"
 
 SRC_URI = " \
- http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofagent_${PV}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa_${PV}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56770_${PV}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/python3-ofdpa_${PV}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofagent_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56770_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/python3-ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
 "
 
 inherit bin_package systemd python3-dir
