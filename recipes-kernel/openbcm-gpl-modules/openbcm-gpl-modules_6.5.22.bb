@@ -6,17 +6,15 @@ LIC_FILES_CHKSUM = " \
 
 inherit module
 
-SRC_URI = " \
-          file://include;subdir=src \
-          file://systems;subdir=src \
-          file://Makefile;subdir=src \
-          file://bisdn-bcm-dev.sh \
-          file://bisdn-bcm-dev.rules \
-          file://patches/0001-gmodule-update-proc-code-for-linux-5.6.patch \
-          file://patches/0002-kernel-modules-add-dropped-defines-to-work-with-5.9.patch \
-          file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch \
-          file://patches/xgs_iproc_compat.patch \
-          "
+SRC_URI = "file://include;subdir=src \
+           file://systems;subdir=src \
+           file://bisdn-bcm-dev.sh \
+           file://bisdn-bcm-dev.rules \
+           file://patches/0001-gmodule-update-proc-code-for-linux-5.6.patch \
+           file://patches/0002-kernel-modules-add-dropped-defines-to-work-with-5.9.patch \
+           file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch \
+           file://patches/xgs_iproc_compat.patch \
+           "
 
 SRC_URI_append_agema-ag7648 = " \
     file://linux_kernel_bde.conf \
