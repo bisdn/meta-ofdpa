@@ -1,8 +1,17 @@
+From 026ceb003806f43d5738da7a1d03c8fff0ec7d37 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Tue, 20 Jul 2021 13:24:30 +0200
+Subject: [PATCH] meta-ofpa: add initial import based on v4.0.0
+
+---
+ systems/bde/linux/kernel/linux-kernel-bde.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
 diff --git a/systems/bde/linux/kernel/linux-kernel-bde.c b/systems/bde/linux/kernel/linux-kernel-bde.c
-index 15ee756b2..b8d7357e2 100644
+index 0929bf8..35f98d1 100644
 --- a/systems/bde/linux/kernel/linux-kernel-bde.c
 +++ b/systems/bde/linux/kernel/linux-kernel-bde.c
-@@ -71,6 +71,9 @@
+@@ -65,6 +65,9 @@
  #define msi_control_reg(base)         (base + PCI_MSI_FLAGS)
  #endif
  #endif
@@ -12,7 +21,7 @@ index 15ee756b2..b8d7357e2 100644
  MODULE_AUTHOR("Broadcom Corporation");
  MODULE_DESCRIPTION("Kernel BDE");
  MODULE_LICENSE("GPL");
-@@ -674,11 +677,15 @@ iproc_cmicd_get_irqres(ibde_dev_t bde_dev, struct resource *res_irq)
+@@ -671,11 +674,15 @@ iproc_cmicd_get_irqres(ibde_dev_t bde_dev, struct resource *res_irq)
          gprintk("Unable to determine iProc version\n");
      }
  
@@ -28,7 +37,7 @@ index 15ee756b2..b8d7357e2 100644
  
  }
  
-@@ -726,7 +733,11 @@ iproc_cmicd_probe(struct platform_device *pldev)
+@@ -723,7 +730,11 @@ iproc_cmicd_probe(struct platform_device *pldev)
      ctrl->pci_device = NULL; /* No PCI bus */
  
      /* Map CMIC block in the AXI memory space into CPU address space */
@@ -40,7 +49,7 @@ index 15ee756b2..b8d7357e2 100644
      if (!ctrl->bde_dev.base_address) {
          gprintk("Error mapping iProc CMIC registers");
          return -1;
-@@ -3176,7 +3187,7 @@ _init(void)
+@@ -3089,7 +3100,7 @@ _init(void)
       * getting removed when the module is unloaded.
       */
      _device_driver.name = LINUX_KERNEL_BDE_NAME ".iproc";
@@ -49,16 +58,16 @@ index 15ee756b2..b8d7357e2 100644
      if (of_find_compatible_node(NULL, NULL, IPROC_CMICX_COMPATIBLE)) {
          iproc_platform_driver_register(&iproc_cmicd_driver);
      } else
-@@ -3184,7 +3195,7 @@ _init(void)
-     if (iproc_has_cmicd()) {
+@@ -3098,7 +3109,7 @@ _init(void)
          iproc_cmicd_get_memregion(&iproc_cmicd_resources[IPROC_CMICD_RES_MEM]);
+         /* PCIe device will be added here */
          iproc_platform_driver_register(&iproc_cmicd_driver);
 -#ifdef CONFIG_OF
 +#if IS_ENABLED(CONFIG_OF) && !IS_ENABLED(CONFIG_ARCH_XGS_IPROC)
          if (!of_find_compatible_node(NULL, NULL, IPROC_CMICD_COMPATIBLE))
  #endif
          {
-@@ -3303,7 +3314,7 @@ _cleanup(void)
+@@ -3220,7 +3231,7 @@ _cleanup(void)
      } else
  #endif
      if (iproc_has_cmicd()) {
