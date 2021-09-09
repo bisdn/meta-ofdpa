@@ -21,6 +21,7 @@ SRC_URI = " \
  http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofagent_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56770_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56870_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${MACHINE_ARCH}/python3-ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
 "
 
@@ -54,7 +55,7 @@ INHIBIT_PACKAGE_DEBUG_SPLIT  = "1"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PACKAGES =+ "ofagent python3-${PN} ${PN}-firmware-bcm56770"
+PACKAGES =+ "ofagent python3-${PN} ${PN}-firmware-bcm56770 ${PN}-firmware-bcm56870"
 
 FILES_${PN} += "\
             ${sbindir}/ofdpa \
@@ -75,6 +76,10 @@ FILES_python3-${PN} = " \
                       "
 FILES_${PN}-firmware-bcm56770 = " \
            ${nonarch_base_libdir}/firmware/brcm/bcm56770*.pkg \
+           "
+
+FILES_${PN}-firmware-bcm56870 = " \
+           ${nonarch_base_libdir}/firmware/brcm/bcm56870*.pkg \
            "
 
 CONFFILES_${PN} = " \
