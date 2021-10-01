@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 BB_STRICT_CHECKSUM = "0"
 
 SRC_URI = " \
- http://repo.bisdn.de/nightly_builds/${MACHINE}/master/packages_latest-build/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
+ ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
 "
 
 # Manually calculate expanded ${SRCPV} value
