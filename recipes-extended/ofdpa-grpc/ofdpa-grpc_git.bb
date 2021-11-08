@@ -1,11 +1,14 @@
 LICENSE = "CLOSED"
 
 # Nightly packages are regenerated regularily
-BB_STRICT_CHECKSUM = "0"
+BB_STRICT_CHECKSUM = "1"
 
 SRC_URI = " \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
+ ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P};;sha256sum=${@d.getVarFlag('SHA256SUM', '${PACKAGE_ARCH}', 1)} \
 "
+
+SHA256SUM[cortexa9-vfp] = "fa3bdad6b191f6c6824dafceca4809378f6ff175d6727bcae2409d2b854a3aad"
+SHA256SUM[corei7-64] = "beafa3d3ce4119717649dcd71d2675af089da309140ad271d8755ab250e0faea"
 
 # Manually calculate expanded ${SRCPV} value
 PV = "0.3+gitAUTOINC+${@'${SRCREV}'[0:10]}"
