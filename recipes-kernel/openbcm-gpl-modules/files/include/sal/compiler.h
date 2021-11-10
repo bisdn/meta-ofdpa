@@ -278,6 +278,9 @@ static int u64_LSW = 0;
 #define u64_L(v)                            (((uint32 *) &(v))[u64_LSW])
 #define COMPILER_64_INIT(_hi, _lo)          ( (((long) (_hi)) << 32) | (_lo))
 #define COMPILER_64_PRINTF_FORMAT           "%lu"
+#define COMPILER_64_PRINTF_SIZE_FORMAT      "l"
+/* literal uint64 literal required by some compilers */
+#define COMPILER_64_LITERAL(value)          value##UL
 #define COMPILER_64_PRINTF_VALUE(value_64)  value_64
 /* } */
 #else /* !LONGS_ARE_64BITS */
@@ -293,6 +296,9 @@ static int u64_LSW = 0;
 #define u64_L(v)                            (((uint32 *) &(v))[u64_LSW])
 #define COMPILER_64_INIT(_hi, _lo)          ( (((long long) (_hi)) << 32) | (_lo))
 #define COMPILER_64_PRINTF_FORMAT           "%llu"
+#define COMPILER_64_PRINTF_SIZE_FORMAT      "ll"
+/* literal uint64 literal required by some compilers */
+#define COMPILER_64_LITERAL(value)          value##ULL
 #define COMPILER_64_PRINTF_VALUE(value_64)  value_64
 
 /* } */

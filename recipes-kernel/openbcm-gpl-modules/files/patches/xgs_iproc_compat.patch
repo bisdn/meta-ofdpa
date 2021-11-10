@@ -1,8 +1,8 @@
 diff --git a/systems/bde/linux/kernel/linux-kernel-bde.c b/systems/bde/linux/kernel/linux-kernel-bde.c
-index 15ee756b2..b8d7357e2 100644
+index d036d2294..879297c18 100644
 --- a/systems/bde/linux/kernel/linux-kernel-bde.c
 +++ b/systems/bde/linux/kernel/linux-kernel-bde.c
-@@ -71,6 +71,9 @@
+@@ -64,6 +64,9 @@
  #define msi_control_reg(base)         (base + PCI_MSI_FLAGS)
  #endif
  #endif
@@ -12,7 +12,7 @@ index 15ee756b2..b8d7357e2 100644
  MODULE_AUTHOR("Broadcom Corporation");
  MODULE_DESCRIPTION("Kernel BDE");
  MODULE_LICENSE("GPL");
-@@ -674,11 +677,15 @@ iproc_cmicd_get_irqres(ibde_dev_t bde_dev, struct resource *res_irq)
+@@ -672,11 +675,15 @@ iproc_cmicd_get_irqres(ibde_dev_t bde_dev, struct resource *res_irq)
          gprintk("Unable to determine iProc version\n");
      }
  
@@ -28,7 +28,7 @@ index 15ee756b2..b8d7357e2 100644
  
  }
  
-@@ -726,7 +733,11 @@ iproc_cmicd_probe(struct platform_device *pldev)
+@@ -724,7 +731,11 @@ iproc_cmicd_probe(struct platform_device *pldev)
      ctrl->pci_device = NULL; /* No PCI bus */
  
      /* Map CMIC block in the AXI memory space into CPU address space */
@@ -40,25 +40,25 @@ index 15ee756b2..b8d7357e2 100644
      if (!ctrl->bde_dev.base_address) {
          gprintk("Error mapping iProc CMIC registers");
          return -1;
-@@ -3176,7 +3187,7 @@ _init(void)
-      * getting removed when the module is unloaded.
+@@ -3219,7 +3230,7 @@ _init(void)
       */
      _device_driver.name = LINUX_KERNEL_BDE_NAME ".iproc";
+ #endif
 -#ifdef CONFIG_OF
 +#if IS_ENABLED(CONFIG_OF) && !IS_ENABLED(CONFIG_ARCH_XGS_IPROC)
      if (of_find_compatible_node(NULL, NULL, IPROC_CMICX_COMPATIBLE)) {
          iproc_platform_driver_register(&iproc_cmicd_driver);
      } else
-@@ -3184,7 +3195,7 @@ _init(void)
-     if (iproc_has_cmicd()) {
+@@ -3228,7 +3239,7 @@ _init(void)
          iproc_cmicd_get_memregion(&iproc_cmicd_resources[IPROC_CMICD_RES_MEM]);
+         /* PCIe device will be added here */
          iproc_platform_driver_register(&iproc_cmicd_driver);
 -#ifdef CONFIG_OF
 +#if IS_ENABLED(CONFIG_OF) && !IS_ENABLED(CONFIG_ARCH_XGS_IPROC)
          if (!of_find_compatible_node(NULL, NULL, IPROC_CMICD_COMPATIBLE))
  #endif
          {
-@@ -3303,7 +3314,7 @@ _cleanup(void)
+@@ -3356,7 +3367,7 @@ _cleanup(void)
      } else
  #endif
      if (iproc_has_cmicd()) {

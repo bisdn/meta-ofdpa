@@ -33,16 +33,15 @@
 #define MEMCPY memcpy
 
 #ifdef CONFIG_X86_64
-#if (defined(__GNUC__) && (__GNUC__ == 8))
+#if (defined(__GNUC__) && (__GNUC__ >= 8))
 /*
- * Prevent gcc 8.1.10 using a compiler inline memcpy even if using -fno-builtin or
- * -fno-builtin-memcpy .
- * __inline_memcpy and __memcpy are kernel functions that may be used instead,
- * for either an inline or non-inline implementations of the function
+ * Prevent gcc from using a compiler builtin memcpy even if using -fno-builtin or
+ * -fno-builtin-memcpy.
+ * Use __memcpy kernel function in x86 Linux instead.
  */
 #undef MEMCPY
 #define MEMCPY __memcpy
-#endif /* (defined(__GNUC__) && (__GNUC__ == 8)) */
+#endif /* (defined(__GNUC__) && (__GNUC__ >= 8)) */
 #endif /* CONFIG_X86_64 */
 
 
@@ -469,12 +468,14 @@ static uint32_t _read(int d, uint32_t addr);
 
 #ifdef BCM_ICS
 #else
+#ifdef CONFIG_PCI
 /* Used to determine overall memory limits across all devices */
 static uint32_t _pci_mem_start = 0xFFFFFFFF;
 static uint32_t _pci_mem_end = 0;
 
 /* Used to control MSI interrupts */
 static int  use_msi = 0;
+#endif
 #endif
 
 #ifdef BCM_PLX9656_LOCAL_BUS
@@ -640,12 +641,12 @@ sand_device_create(void)
     cpu_address = IOREMAP(0xe0000000, 0x100000);
 #endif
 
-    if ((ctrl->bde_dev.device == PCP_PCI_DEVICE_ID)) {
+    if (ctrl->bde_dev.device == PCP_PCI_DEVICE_ID) {
         ctrl->bde_dev.device = GEDI_DEVICE_ID;
         ctrl->bde_dev.rev = GEDI_REV_ID;
     }
 
-    if ((ctrl->bde_dev.device == ACP_PCI_DEVICE_ID)) {
+    if (ctrl->bde_dev.device == ACP_PCI_DEVICE_ID) {
         ctrl->dev_type |= BDE_PCI_DEV_TYPE | BDE_SWITCH_DEV_TYPE;
     }
 
@@ -911,23 +912,14 @@ static int
 iproc_has_cmicd(void)
 {
     void *iproc_cca_base;
-    uint32 cca_cid;
 
     /* Read ChipcommonA chip id register to identify current SOC */
     iproc_cca_base = IOREMAP(IPROC_CHIPCOMMONA_BASE, 0x3000);
     if (iproc_cca_base == NULL) {
-        gprintk("iproc_has_cmicd: ioremap of ChipcommonA registers failed"); 
+        gprintk("iproc_has_cmicd: ioremap of ChipcommonA registers failed");
         return 0;
     }
-    cca_cid = readl((uint32 *)iproc_cca_base);
-    cca_cid &= 0xffff;
     iounmap(iproc_cca_base);
-
-    /* Only allowed accessing CMICD module if the SOC has it */
-    switch (cca_cid) {
-        default:
-            break;
-    }
 
     /* Device has CMIC */
     return 1;
@@ -1101,6 +1093,7 @@ _ics_bde_create(void)
 
 #else /* !BCM_ICS */
 
+#ifdef CONFIG_PCI
 extern struct pci_bus *pci_find_bus(int domain, int busnr);
 
 /*
@@ -1621,6 +1614,22 @@ static const struct pci_device_id _id_table[] = {
     { BROADCOM_VENDOR_ID, BCM8828D_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM8828E_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM8828F_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88290_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88291_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88292_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88293_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88294_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88295_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88296_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88297_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88298_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88299_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8829A_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8829B_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8829C_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8829D_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8829E_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8829F_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM88850_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM88851_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM88852_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
@@ -1653,6 +1662,21 @@ static const struct pci_device_id _id_table[] = {
     { BROADCOM_VENDOR_ID, BCM8884D_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM8884E_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
     { BROADCOM_VENDOR_ID, BCM8884F_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88831_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88832_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88833_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88834_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88835_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88836_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88837_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88838_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM88839_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8883A_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8883B_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8883C_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8883D_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8883E_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
+    { BROADCOM_VENDOR_ID, BCM8883F_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
 #endif /* BCM_DNX_SUPPORT */
 #ifdef BCM_DFE_SUPPORT
     { BROADCOM_VENDOR_ID, BCM88770_DEVICE_ID, PCI_ANY_ID, PCI_ANY_ID },
@@ -2878,6 +2902,7 @@ _pci_remove(struct pci_dev* dev)
 
     /* Free our interrupt handler, if we have one */
     if (ctrl->isr || ctrl->isr2) {
+#ifdef CONFIG_PCI_MSI
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,84))
         if (ctrl->use_msi >= PCI_USE_INT_MSIX) {
             int i;
@@ -2885,6 +2910,7 @@ _pci_remove(struct pci_dev* dev)
                 free_irq(ctrl->entries[i].vector, ctrl);
         }
         else
+#endif
 #endif
         {
             free_irq(ctrl->iLine, ctrl);
@@ -2906,6 +2932,7 @@ static struct pci_driver _device_driver = {
     .id_table = _id_table,
     /* The rest are dynamic */
 };
+#endif /* CONFIG_PCI */
 
 static void
 _spi_device_setup(void) {
@@ -2961,10 +2988,8 @@ map_local_bus(uint64_t addr, uint32_t size)
 
 #ifdef BCM_PLX9656_LOCAL_BUS
 
-#if 1
 #define DEV_REG_BASE_OFFSET     PL0_OFFSET /* Polaris register base */
 #define DEV_REG_DEVID           0          /* Device ID is first register */
-#endif
 
 /*
  * The difference at map_local_bus2:
@@ -2996,9 +3021,7 @@ map_local_bus2(bde_ctrl_t *plx_ctrl, uint32_t dev_base, uint32_t size)
     ctrl->iowin[0].addr = plx_ctrl->iowin[0].addr + (resource_size_t)dev_base;
     ctrl->iowin[0].size = size;
 
-#if 1
     addr = (uint8_t *)ctrl->bde_dev.base_address + PL0_REVISION_REG;
-#endif
     dev_rev_id = readl(addr);
     ctrl->bde_dev.device = dev_rev_id >> 16;
     ctrl->bde_dev.rev = (dev_rev_id & 0xFF);
@@ -3041,9 +3064,7 @@ probe_plx_local_bus(void)
     addr = (uint8_t *)plx_ctrl.bde_dev.base_address + CPLD_OFFSET + CPLD_RESET_REG;
     writel(CPLD_RESET_NONE, addr);
 #endif
-#if 1
     ctrl = map_local_bus2(&plx_ctrl, PL0_OFFSET, PL0_SIZE);
-#endif
     if (ctrl == 0)
         return -1;
 
@@ -3084,11 +3105,13 @@ _init(void)
     /* allocate and init the DMA buffer pool */
     _dma_init();
 #ifdef IPROC_CMICD
+#ifdef CONFIG_PCI
     /*
      * Adjust the PCI driver name to prevent our device file from
      * getting removed when the module is unloaded.
      */
     _device_driver.name = LINUX_KERNEL_BDE_NAME ".iproc";
+#endif
 #ifdef CONFIG_OF
     if (of_find_compatible_node(NULL, NULL, IPROC_CMICX_COMPATIBLE)) {
         iproc_platform_driver_register(&iproc_cmicd_driver);
@@ -3112,6 +3135,7 @@ _init(void)
     _ics_bde_create();
 #else /* PCI */
 
+#ifdef CONFIG_PCI
     /* Configure MSI interrupt support */
     use_msi = usemsi;
 
@@ -3140,18 +3164,23 @@ _init(void)
 
     if (unlikely(debug >= 1))
         gprintk("%s(%d):use_msi = %d\n", __func__, __LINE__, use_msi);
+#endif /* CONFIG_PCI */
 
     if (spi_devid) {
         _spi_device_setup();
     } else {
+#ifdef CONFIG_PCI
         /* PCIe devices will be probed here */
         if (pci_register_driver(&_device_driver) < 0) {
             return -ENODEV;
         }
+#endif
     }
 
+#ifdef CONFIG_PCI
     /* Note: PCI-PCI bridge  uses results from pci_register_driver */
     p2p_bridge();
+#endif
 
 #ifdef BCM_METROCORE_LOCAL_BUS
     if (probe_metrocore_local_bus()) {
@@ -3249,7 +3278,9 @@ _cleanup(void)
 
 #ifdef BCM_ICS
 #else
+#ifdef CONFIG_PCI
     pci_unregister_driver(&_device_driver);
+#endif
 #endif /* BCM_ICS */
     return 0;
 }
@@ -3408,12 +3439,12 @@ _bde_mmap(struct file *filp, struct vm_area_struct *vma)
 static char _modname[] = LINUX_KERNEL_BDE_NAME;
 
 static gmodule_t _gmodule = {
-    name: LINUX_KERNEL_BDE_NAME,
-    major: LINUX_KERNEL_BDE_MAJOR,
-    init: _init,
-    cleanup: _cleanup,
-    pprint: _pprint,
-    mmap: _bde_mmap,
+    .name = LINUX_KERNEL_BDE_NAME,
+    .major = LINUX_KERNEL_BDE_MAJOR,
+    .init = _init,
+    .cleanup = _cleanup,
+    .pprint = _pprint,
+    .mmap = _bde_mmap,
 };
 
 gmodule_t *
@@ -3704,7 +3735,6 @@ _interrupt_connect(int d,
             if(ret != 0)
                 goto msi_exit;
         }
-#endif
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,84))
         if (ctrl->use_msi == PCI_USE_INT_MSIX) {
             int i;
@@ -3726,6 +3756,7 @@ _interrupt_connect(int d,
             }
         }
         else
+#endif
 #endif
         {
 #if defined(IPROC_CMICD) && defined(CONFIG_OF)
@@ -3842,6 +3873,7 @@ _interrupt_disconnect(int d)
     }
 
     if (isr_active) {
+#ifdef CONFIG_PCI_MSI
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,2,84))
         if (ctrl->use_msi >= PCI_USE_INT_MSIX) {
             int i;
@@ -3854,6 +3886,7 @@ _interrupt_disconnect(int d)
             }
         }
         else
+#endif
 #endif
 #if defined(IPROC_CMICD) && defined(CONFIG_OF)
         if (of_find_compatible_node(NULL, NULL, IPROC_CMICX_COMPATIBLE)) {
@@ -4181,6 +4214,7 @@ lkbde_cpu_pci_register(int d)
       case J2C_2ND_DEVICE_ID:
       case Q2A_DEVICE_ID:
       case Q2U_DEVICE_ID:
+      case Q2N_DEVICE_ID:
       case J2P_DEVICE_ID:
 #endif
 #ifdef BCM_DNXF_SUPPORT
@@ -4252,29 +4286,29 @@ LKM_EXPORT_SYM(lkbde_mem_read);
 #endif /* BCM_SAND_SUPPORT */
 
 static ibde_t _ibde = {
-    name: _name,
-    num_devices: _num_devices,
-    get_dev: _get_dev,
-    get_dev_type: _get_dev_type,
-    pci_conf_read: _pci_conf_read,
-    pci_conf_write: _pci_conf_write,
-    pci_bus_features: _pci_bus_features,
-    read: _read,
-    write: _write,
-    salloc: _salloc,
-    sfree: _sfree,
-    sinval: _sinval,
-    sflush: _sflush,
-    interrupt_connect: _interrupt_connect,
-    interrupt_disconnect: _interrupt_disconnect,
-    l2p: _l2p,
-    p2l: _p2l,
+    .name = _name,
+    .num_devices = _num_devices,
+    .get_dev = _get_dev,
+    .get_dev_type = _get_dev_type,
+    .pci_conf_read = _pci_conf_read,
+    .pci_conf_write = _pci_conf_write,
+    .pci_bus_features = _pci_bus_features,
+    .read = _read,
+    .write = _write,
+    .salloc = _salloc,
+    .sfree = _sfree,
+    .sinval = _sinval,
+    .sflush = _sflush,
+    .interrupt_connect = _interrupt_connect,
+    .interrupt_disconnect = _interrupt_disconnect,
+    .l2p = _l2p,
+    .p2l = _p2l,
 
     NULL,
     NULL,
-    iproc_read: _iproc_read,
-    iproc_write: _iproc_write,
-    get_cmic_ver: _get_cmic_ver,
+    .iproc_read = _iproc_read,
+    .iproc_write = _iproc_write,
+    .get_cmic_ver = _get_cmic_ver,
 };
 
 /*

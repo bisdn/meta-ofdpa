@@ -150,4 +150,6 @@ extern int sal_tls_key_set(sal_tls_key_t *, void *) SAL_ATTR_WEAK;
 extern void * sal_tls_key_get(sal_tls_key_t *) SAL_ATTR_WEAK;
 extern int sal_tls_key_delete(sal_tls_key_t *) SAL_ATTR_WEAK;
 
+extern void print_process_info(int pid) SAL_ATTR_WEAK;
+
 #endif	/* !_SAL_THREAD_H */
