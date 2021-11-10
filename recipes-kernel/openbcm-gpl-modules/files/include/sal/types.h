@@ -175,6 +175,7 @@ typedef uint8   sal_ip6_addr_t[SAL_IP6_ADDRLEN];    /* IPv6 Address */
 
 #define SAL_MACADDR_STR_LEN     18              /* Formatted MAC address */
 #define SAL_IPADDR_STR_LEN      16              /* Formatted IP address */
+#define SAL_IP6ADDR_STR_LEN     64              /* Formatted IPV6 address */
 
 
 /* Adjust justification for uint32 writes to fields */

@@ -350,6 +350,9 @@ shbde_pci_max_payload_set(shbde_hal_t *shbde, void *pci_dev, int maxpayload)
             }
         }
 
+#if defined(OFDPA_FIXUP) && defined(ZERO_MAX_PCI_PAYLOAD)
+        max_val = 0;
+#endif
         /* Update max payload size */
         devctl &= ~(0x7 << 5);
         devctl |= (max_val) << 5;

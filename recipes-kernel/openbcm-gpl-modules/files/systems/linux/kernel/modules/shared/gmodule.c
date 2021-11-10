@@ -125,12 +125,12 @@ static int _gmodule_proc_release(struct inode * inode, struct file * file) {
 }
 
 struct file_operations _gmodule_proc_fops = {
-    owner:      THIS_MODULE,
-    open:       _gmodule_proc_open,
-    read:       seq_read,
-    llseek:     seq_lseek,
-    write:      _gmodule_proc_write,
-    release:    _gmodule_proc_release,
+    .owner =      THIS_MODULE,
+    .open =       _gmodule_proc_open,
+    .read =       seq_read,
+    .llseek =     seq_lseek,
+    .write =      _gmodule_proc_write,
+    .release =    _gmodule_proc_release,
 };
 #else
 int
@@ -310,15 +310,15 @@ _gmodule_mmap(struct file *filp, struct vm_area_struct *vma)
 
 struct file_operations _gmodule_fops = {
 #ifdef HAVE_UNLOCKED_IOCTL
-    unlocked_ioctl: _gmodule_unlocked_ioctl,
+    .unlocked_ioctl = _gmodule_unlocked_ioctl,
 #else
-    ioctl:      _gmodule_ioctl,
+    .ioctl =      _gmodule_ioctl,
 #endif
-    open:       _gmodule_open,
-    release:    _gmodule_release,
-    mmap:       _gmodule_mmap,
+    .open =       _gmodule_open,
+    .release =    _gmodule_release,
+    .mmap =       _gmodule_mmap,
 #ifdef HAVE_COMPAT_IOCTL
-    compat_ioctl: _gmodule_compat_ioctl,
+    .compat_ioctl = _gmodule_compat_ioctl,
 #endif
 };
 

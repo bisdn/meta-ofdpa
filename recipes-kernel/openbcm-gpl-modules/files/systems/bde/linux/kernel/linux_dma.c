@@ -855,7 +855,7 @@ _mpool_alloc(size_t size)
             pbase = virt_to_phys(high_memory);
         }
         _cpu_pbase = pbase;
-        _dma_vbase = phys_to_virt(size);
+        _dma_vbase = phys_to_virt(pbase);
         _use_dma_mapping = 1;
     } else {
         switch (dmaalloc) {
@@ -1017,9 +1017,9 @@ void _dma_per_device_init(int dev_index)
         {
             if (dma_debug >= 2) {
                 gprintk("remapping DMA buffer pool from physical:0x%lx original kernel_virt:0x%lx\n",
-                    (unsigned long)_cpu_pbase, (unsigned long)_dma_vbase);
+                    (unsigned long)_dma_pbase, (unsigned long)_dma_vbase);
             }
-            _dma_vbase = IOREMAP(_cpu_pbase, _dma_mem_size);
+            _dma_vbase = IOREMAP(_dma_pbase, _dma_mem_size);
         }
 
         if (dma_debug >= 1) {
