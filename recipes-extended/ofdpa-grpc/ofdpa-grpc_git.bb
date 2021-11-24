@@ -9,7 +9,7 @@ SRC_URI = " \
 
 # Manually calculate expanded ${SRCPV} value
 PV = "0.3+gitAUTOINC+${@'${SRCREV}'[0:10]}"
-SRCREV = "c8281e4cd6c62e653e4c21963b3e27d8e228f33f"
+SRCREV = "3449f76800dd89fd3040dcacac720876b720fab5"
 
 DEPENDS = "grpc gflags glog protobuf openssl ofdpa"
 
