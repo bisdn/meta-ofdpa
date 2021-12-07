@@ -12,6 +12,7 @@ SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 DEPENDS = "python3 onl"
 RDEPENDS_${PN} += "libgcc udev openbcm-gpl-modules"
 
+RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56370', '${PN}-firmware-bcm56370', '', d)}"
 RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${PN}-firmware-bcm56770', '', d)}"
 
 # Nightly packages are regenerated regularily
@@ -20,6 +21,7 @@ BB_STRICT_CHECKSUM = "0"
 SRC_URI = " \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofagent_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
+ ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56370_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56770_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56870_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/python3-ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
@@ -55,7 +57,13 @@ INHIBIT_PACKAGE_DEBUG_SPLIT  = "1"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PACKAGES =+ "ofagent python3-${PN} ${PN}-firmware-bcm56770 ${PN}-firmware-bcm56870"
+PACKAGES =+ "\
+	     ofagent \
+	     python3-${PN} \
+	     ${PN}-firmware-bcm56370 \
+	     ${PN}-firmware-bcm56770 \
+	     ${PN}-firmware-bcm56870 \
+	     "
 
 FILES_${PN} += "\
             ${sbindir}/ofdpa \
@@ -74,6 +82,11 @@ FILES_python3-${PN} = " \
                       ${PYTHON_SITEPACKAGES_DIR} \
                       ${sbindir}/ofdpa*.py \
                       "
+
+FILES_${PN}-firmware-bcm56370 = " \
+	    ${nonarch_base_libdir}/firmware/brcm/bcm56370*.pkg \
+	    "
+
 FILES_${PN}-firmware-bcm56770 = " \
            ${nonarch_base_libdir}/firmware/brcm/bcm56770*.pkg \
            "
