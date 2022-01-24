@@ -15,6 +15,7 @@ SRC_URI = " \
           file://patches/0001-gmodule-update-proc-code-for-linux-5.6.patch \
           file://patches/0002-kernel-modules-add-dropped-defines-to-work-with-5.9.patch \
           file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch \
+          file://patches/0004-bcm-knet-proc_code.patch \
           file://patches/xgs_iproc_compat.patch \
           "
 
@@ -45,7 +46,7 @@ do_install_append_agema-ag7648() {
         install -m 0644 ${WORKDIR}/*.conf ${D}${sysconfdir}/modprobe.d/
 }
 
-KERNEL_MODULE_AUTOLOAD += " linux-kernel-bde linux-user-bde"
+KERNEL_MODULE_AUTOLOAD += " linux-kernel-bde linux-user-bde linux-bcm-knet"
 
 # The inherit of module.bbclass will automatically name module packages with
 # "kernel-module-" prefix as required by the oe-core build environment.

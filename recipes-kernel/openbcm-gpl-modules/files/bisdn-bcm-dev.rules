@@ -2,3 +2,5 @@ ACTION=="add", SUBSYSTEM=="module", DEVPATH=="/module/linux_kernel_bde", RUN+="S
 ACTION=="remove", SUBSYSTEM=="module", DEVPATH=="/module/linux_kernel_bde", RUN+="SBINDIR/bisdn-bcm-dev.sh"
 ACTION=="add", SUBSYSTEM=="module", DEVPATH=="/module/linux_user_bde", RUN+="SBINDIR/bisdn-bcm-dev.sh"
 ACTION=="remove", SUBSYSTEM=="module", DEVPATH=="/module/linux_user_bde", RUN+="SBINDIR/bisdn-bcm-dev.sh"
+ACTION=="add", SUBSYSTEM=="module", DEVPATH=="/module/linux_bcm_knet", RUN+="SBINDIR/bisdn-bcm-dev.sh"
+ACTION=="remove", SUBSYSTEM=="module", DEVPATH=="/module/linux_bcm_knet", RUN+="SBINDIR/bisdn-bcm-dev.sh"

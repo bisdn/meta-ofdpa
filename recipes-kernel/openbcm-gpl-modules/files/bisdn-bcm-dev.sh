@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # sanity check
-[ "$DEVPATH" = "/module/linux_user_bde" ] || [ "$DEVPATH" = "/module/linux_kernel_bde" ] || exit 0
+[ "$DEVPATH" = "/module/linux_user_bde" ] || [ "$DEVPATH" = "/module/linux_kernel_bde" ] || [ "$DEVPATH" = "/module/linux_bcm_knet" ] || exit 0
                                                                                                   
 DEV=$(echo $DEVPATH | sed -e 's#/module/##' | sed -e 's#_#-#g')                                   
                                                                
