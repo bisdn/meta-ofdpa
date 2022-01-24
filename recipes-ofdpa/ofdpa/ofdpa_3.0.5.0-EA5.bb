@@ -6,7 +6,7 @@ PV = "3.0.5.0-EA5+sdk-${SDK_VERSION}+gitAUTOINC+${@'${SRCREV_ofdpa}'[:10]}_${@'$
 
 PR = "r10"
 SDK_VERSION = "6.5.24"
-SRCREV_ofdpa = "c2d7f9f3af8730338d4e7b8936e27991f94778a4"
+SRCREV_ofdpa = "1cd775fc257dcfb382113c834c64597d52eafc5a"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 
 DEPENDS = "python3 onl"
