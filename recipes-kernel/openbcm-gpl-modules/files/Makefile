@@ -14,6 +14,8 @@ else
   ccflags-y			+= -DLE_HOST=1 -DSYS_BE_PIO=0 -DSYS_BE_PACKET=0 -DSYS_BE_OTHER=0
 endif
 
+ccflags-y			+= -DINCLUDE_KNET=1
+
 SHARED_OBJS			:= systems/bde/linux/shared/mpool.o \
 				   systems/linux/kernel/modules/shared/gmodule.o
 
@@ -28,7 +30,10 @@ linux-kernel-bde-y		+= systems/bde/shared/shbde_pci.o
 linux-user-bde-y		:= $(SHARED_OBJS)
 linux-user-bde-y		+= systems/bde/linux/user/kernel/linux-user-bde.o
 
-obj-m				:= linux-kernel-bde.o linux-user-bde.o
+linux-bcm-knet-y		:= $(SHARED_OBJS)
+linux-bcm-knet-y		+= systems/linux/kernel/modules/bcm-knet/bcm-knet.o
+
+obj-m				:= linux-bcm-knet.o linux-kernel-bde.o linux-user-bde.o
 
 SRC				:= $(shell pwd)
 
