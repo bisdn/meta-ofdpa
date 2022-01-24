@@ -16,6 +16,7 @@ SRC_URI = " \
           file://patches/0002-kernel-modules-add-dropped-defines-to-work-with-5.9.patch \
           file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch \
           file://patches/0004-bcm-knet-proc_code.patch \
+          file://patches/0005-bcm-knet-strip-vlan-tag-if-received-untagged-at-port.patch \
           file://patches/xgs_iproc_compat.patch \
           "
 

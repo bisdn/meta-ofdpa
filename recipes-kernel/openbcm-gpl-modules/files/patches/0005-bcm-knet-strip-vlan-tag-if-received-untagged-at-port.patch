@@ -1,0 +1,206 @@
+From 7c710f296899a0cee910a172c66b5ced745e947e Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Fri, 4 Feb 2022 12:34:02 +0100
+Subject: [PATCH] bcm-knet: strip vlan tag if received untagged at port
+
+The CPU port will always add a vlan tag, but we can check the header for
+the state at reception. If it was received untagged, strip the vlan tag
+to forward the packet as received to the kernel.
+
+Different ASICs use different DCBs, which have the information stored at
+different places. Add a function checking these, based on the documented
+dcb types in OpenBCM/sdk-6.5.24/include/soc/shared/dcbformat/.
+
+For now only support a subset of dcb types which we only care about.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 121 +++++++++++++-----
+ 1 file changed, 90 insertions(+), 31 deletions(-)
+
+diff --git a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 025c6d759..84f63b5f8 100755
+--- a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -2097,6 +2097,42 @@ bkn_dump_pkt(uint8_t *data, int size, int txrx)
+     }
+ }
+ 
++static inline int
++bkn_pkt_is_rx_untagged(bkn_switch_info_t *sinfo, uint32_t *meta)
++{
++    switch (sinfo->dcb_type) {
++    case 28:
++        /*
++         * DPP:
++         * check ingress untagged bit being set
++         */
++        return meta[9] & (1 << 11) == 1;
++    case 23:
++    case 24:
++    case 26:
++    case 29:
++    case 31:
++    case 32:
++    case 34:
++    case 35:
++    case 37:
++        /*
++         * Triumph3 and newer:
++         * check ingress tag status field in word 13 to be no tag
++         */
++        return (meta[13] & 0x3) == 0;
++    case 36:
++        /*
++         * Trident 3:
++         * check ingress tag status field in match_id_lo to be no tag
++         */
++        return ((meta[13] >> 9) & 0x3) == 0;
++    default:
++        /* currently unhandled */
++        return 0;
++    }
++}
++
+ static bkn_switch_info_t *
+ bkn_sinfo_from_unit(int unit)
+ {
+@@ -3785,6 +3821,9 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+             case KCOM_DEST_T_NETIF:
+                 priv = bkn_netif_lookup(sinfo, filter->kf.dest_id);
+                 if (priv) {
++                    int strip_vlan_tag = 0;
++                    uint16_t tci;
++
+                     /* Check that software link is up */
+                     if (!netif_carrier_ok(priv->dev)) {
+                         sinfo->rx[chan].pkts_d_no_link++;
+@@ -3819,26 +3858,22 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+ 
+                     /* Save for RCPU before stripping tag */
+                     ethertype = PKT_U16_GET(pkt, 16);
++                    tci = PKT_U16_GET(pkt, 14);
++
++                    if (bkn_pkt_is_rx_untagged(sinfo, meta)) {
++                        strip_vlan_tag = 1;
++                    }
++
+                     if ((priv->flags & KCOM_NETIF_F_KEEP_RX_TAG) == 0) {
+                         uint16_t vlan_proto = PKT_U16_GET(pkt, 12);
+ 
+                         if (filter->kf.flags & KCOM_FILTER_F_STRIP_TAG) {
+-                            /* Strip the VLAN tag */
+-                            if (vlan_proto == ETH_P_8021Q ||
+-                                vlan_proto == ETH_P_8021AD) {
+-                                DBG_FLTR(("Strip VLAN tag\n"));
+-                                for (idx = 11; idx >= 0; idx--) {
+-                                    pkt[idx+4] = pkt[idx];
+-                                }
+-                                pktlen -= 4;
+-                                pkt += 4;
+-                            }
++                            strip_vlan_tag = 1;
+                         } else {
+                             /*
+                              * Mark packet as VLAN-tagged, otherwise newer
+                              * kernels will strip the tag.
+                              */
+-                            uint16_t tci = PKT_U16_GET(pkt, 14);
+ 
+                             if (priv->flags & KCOM_NETIF_F_RCPU_ENCAP) {
+                                 bkn_vlan_hwaccel_put_tag(skb, ETH_P_8021Q, tci);
+@@ -3854,6 +3889,20 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+                         }
+                     }
+ 
++                    if (strip_vlan_tag) {
++                        uint16_t vlan_proto = PKT_U16_GET(pkt, 12);
++                        /* Strip the VLAN tag */
++                        if (vlan_proto == ETH_P_8021Q ||
++                            vlan_proto == ETH_P_8021AD) {
++                            DBG_FLTR(("Strip VLAN tag\n"));
++                            for (idx = 11; idx >= 0; idx--) {
++                                 pkt[idx+4] = pkt[idx];
++                            }
++                            pktlen -= 4;
++                            pkt += 4;
++                        }
++                    }
++
+                     skb_copy_to_linear_data(skb, pkt, pktlen);
+                     if (device_is_sand(sinfo)) {
+                         /* CRC has been stripped */
+@@ -4227,6 +4276,7 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+                 priv = bkn_netif_lookup(sinfo, filter->kf.dest_id);
+                 if (priv) {
+                     int ethertype;
++                    int strip_vlan_tag = 0;
+ 
+                     /* Check that software link is up */
+                     if (!netif_carrier_ok(priv->dev)) {
+@@ -4267,33 +4317,42 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+ 
+                     /* Save for RCPU before stripping tag */
+                     ethertype = PKT_U16_GET(skb->data, 16);
+-                    if ((priv->flags & KCOM_NETIF_F_KEEP_RX_TAG) == 0) {
++
++                    if (bkn_pkt_is_rx_untagged(sinfo, meta)) {
++                        strip_vlan_tag = 1;
++                    }
++
++                    if ((priv->flags & KCOM_NETIF_F_KEEP_RX_TAG) == 0 &&
++                        filter->kf.flags & KCOM_FILTER_F_STRIP_TAG) {
++                        strip_vlan_tag = 1;
++                    }
++
++                    if (strip_vlan_tag) {
+                         uint16_t vlan_proto;
+ 
+                         vlan_proto = PKT_U16_GET(skb->data, 12);
+-                        if (filter->kf.flags & KCOM_FILTER_F_STRIP_TAG) {
+-                            /* Strip VLAN tag */
+-                            if (vlan_proto == ETH_P_8021Q ||
+-                                vlan_proto == ETH_P_8021AD) {
+-                                DBG_FLTR(("Strip VLAN tag\n"));
+-                                ((u32*)skb->data)[3] = ((u32*)skb->data)[2];
+-                                ((u32*)skb->data)[2] = ((u32*)skb->data)[1];
+-                                ((u32*)skb->data)[1] = ((u32*)skb->data)[0];
+-                                skb_pull(skb, 4);
+-                                if (device_is_sand(sinfo)) {
+-                                    for (idx = pkt_hdr_size; idx >= 4; idx--) {
+-                                        pkt[idx] = pkt[idx - 4];
+-                                    }
+-                                } else if (sinfo->cmic_type == 'x') {
+-                                    for (idx = pkt_hdr_size / sizeof(uint32_t);
+-                                         idx; idx--) {
+-                                        meta[idx] = meta[idx - 1];
+-                                    }
+-                                    meta++;
++                        /* Strip VLAN tag */
++                        if (vlan_proto == ETH_P_8021Q ||
++                            vlan_proto == ETH_P_8021AD) {
++                            DBG_FLTR(("Strip VLAN tag\n"));
++                            ((u32*)skb->data)[3] = ((u32*)skb->data)[2];
++                            ((u32*)skb->data)[2] = ((u32*)skb->data)[1];
++                            ((u32*)skb->data)[1] = ((u32*)skb->data)[0];
++                            skb_pull(skb, 4);
++                            if (device_is_sand(sinfo)) {
++                                for (idx = pkt_hdr_size; idx >= 4; idx--) {
++                                    pkt[idx] = pkt[idx - 4];
+                                 }
++                            } else if (sinfo->cmic_type == 'x') {
++                                for (idx = pkt_hdr_size / sizeof(uint32_t);
++                                     idx; idx--) {
++                                    meta[idx] = meta[idx - 1];
++                                }
++                                meta++;
+                             }
+                         }
+                     }
++
+                     if (device_is_sand(sinfo)) {
+                         rx_cb_meta = sand_scratch_data;
+                     } else {
+-- 
+2.35.1
+
