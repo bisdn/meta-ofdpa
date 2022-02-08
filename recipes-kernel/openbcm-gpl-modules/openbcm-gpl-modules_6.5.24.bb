@@ -17,6 +17,9 @@ SRC_URI = " \
           file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch \
           file://patches/0004-bcm-knet-proc_code.patch \
           file://patches/0005-bcm-knet-strip-vlan-tag-if-received-untagged-at-port.patch \
+          file://patches/0006-bcm-knet-report-link-state.patch \
+          file://patches/0007-bcm-knet-allow-setting-speed-duplex.patch \
+          file://patches/0008-bcm-knet-implement-get_link_ksettings.patch \
           file://patches/xgs_iproc_compat.patch \
           "
 
