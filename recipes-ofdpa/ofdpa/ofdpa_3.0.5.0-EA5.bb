@@ -18,6 +18,9 @@ RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${
 # Nightly packages are regenerated regularily
 BB_STRICT_CHECKSUM = "0"
 
+# When building from the bisdn-linux repo, FEEDDOMAIN and FEEDURIPREFIX are
+# pulled in from
+# https://github.com/bisdn/meta-switch/blob/master/conf/distro/bisdn-linux.conf
 SRC_URI = " \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofagent_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
  ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
