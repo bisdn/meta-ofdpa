@@ -20,6 +20,7 @@ SRC_URI = " \
           file://patches/0006-bcm-knet-report-link-state.patch \
           file://patches/0007-bcm-knet-allow-setting-speed-duplex.patch \
           file://patches/0008-bcm-knet-implement-get_link_ksettings.patch \
+          file://patches/0009-bcm-knet-fix-race-between-creation-and-open.patch \
           file://patches/xgs_iproc_compat.patch \
           "
 

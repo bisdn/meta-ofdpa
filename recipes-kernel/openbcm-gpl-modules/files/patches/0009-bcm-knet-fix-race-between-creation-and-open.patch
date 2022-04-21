@@ -1,0 +1,93 @@
+From 7d61bf3b91d6541676c281cc9bbf7d83f8360516 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Wed, 20 Apr 2022 16:35:24 +0200
+Subject: [PATCH] bcm-knet: fix race between creation and open
+
+When creating a netif, the netif will be registered and made available
+to userspace before its private data is initialized.
+
+This creates a window where accessing the device (e.g. opening it) may
+cause a null pointer access since netdev_priv() isn't populated yet.
+
+E.g. bkn_open will get priv->sinfo and access its fields:
+
+  bkn_open(struct net_device *dev)
+  {
+      bkn_priv_t *priv = netdev_priv(dev);
+      bkn_switch_info_t *sinfo = priv->sinfo;
+
+But sinfo is only set *after* the netdev registration:
+
+    if ((dev = bkn_init_ndev(ma, kmsg->netif.name)) == NULL) {
+        kmsg->hdr.status = KCOM_E_RESOURCE;
+        return sizeof(kcom_msg_hdr_t);
+    }
+    priv = netdev_priv(dev);
+    priv->dev = dev;
+    priv->sinfo = sinfo;
+
+This can easily happen if a network manager like systemd-networkd tries
+to configure and enable the network interface as soon as it is created.
+
+Fix this by delaying register_netdev() until after the private data is
+populated, with added code to undo any additional changes in case the
+registration fails.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 25 ++++++++++++++-----
+ 1 file changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index e0d86c403..b4038f18f 100755
+--- a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -6844,12 +6844,6 @@ bkn_init_ndev(u8 *mac, char *name)
+ 
+     bkn_dev_net_set(dev, current->nsproxy->net_ns);
+ 
+-    /* Register the kernel Ethernet device */
+-    if (register_netdev(dev)) {
+-        DBG_WARN(("Error registering Ethernet device.\n"));
+-        free_netdev(dev);
+-        return NULL;
+-    }
+     DBG_VERB(("Created Ethernet device %s.\n", dev->name));
+ 
+     return dev;
+@@ -8662,6 +8656,18 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+     DBG_VERB(("Assigned ID %d to Ethernet device %s\n",
+               priv->id, dev->name));
+ 
++    /* Register the kernel Ethernet device */
++    if (register_netdev(dev)) {
++        DBG_WARN(("Error registering virtual Ethernet device.\n"));
++        spin_lock_irqsave(&sinfo->lock, flags);
++        list_del(&priv->list);
++        sinfo->ndevs[id] = NULL;
++        spin_unlock_irqrestore(&sinfo->lock, flags);
++        free_netdev(dev);
++        kmsg->hdr.status = KCOM_E_RESOURCE;
++        return sizeof(kcom_msg_hdr_t);
++    }
++
+     kmsg->netif.id = priv->id;
+     memcpy(kmsg->netif.macaddr, dev->dev_addr, 6);
+     memcpy(kmsg->netif.name, dev->name, KCOM_NETIF_NAME_MAX - 1);
+@@ -9491,6 +9497,13 @@ bkn_knet_dev_init(int d)
+         priv->id = -1;
+     }
+ 
++    /* Register the kernel Ethernet device */
++    if (register_netdev(dev)) {
++        DBG_WARN(("Error registering base Ethernet device.\n"));
++        _cleanup();
++        return -ENOMEM;
++    }
++
+     if (use_napi) {
+         netif_napi_add(dev, &sinfo->napi, bkn_poll, napi_weight);
+     }
+-- 
+2.35.1
+
