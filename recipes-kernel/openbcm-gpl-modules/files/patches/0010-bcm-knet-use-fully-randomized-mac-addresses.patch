@@ -1,0 +1,64 @@
+From df20798becb4e6d2feda60b086c7ce5c1b9e4f68 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 25 Apr 2022 10:48:26 +0200
+Subject: [PATCH] bcm-knet: use fully randomized mac addresses
+
+Instead of using partially randomized mac addresses with a Broadcom OUI
+prefix, use fully randomized mac addresses for generated virtualized
+Ethernet devices.
+
+To make sure the address is properly tagged as random, switch from
+setting dev->dev_addr to using the helper functions
+eth_hw_addr_{random,set}. Since these work on an existing device, we
+need to move deciding whether to use a random mac into bkn_init_ndev.
+
+Keep the Broadcom OUI prefixed MAC address for the base Ethernet device,
+to make it more easily identifiable.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c       | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index b4038f18f..7046770c7 100755
+--- a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -6804,7 +6804,11 @@ bkn_init_ndev(u8 *mac, char *name)
+ #endif
+ 
+     /* Set the device MAC address */
+-    memcpy(dev->dev_addr, mac, 6);
++    if ((mac[0] | mac[1] | mac[2] | mac[3] | mac[4] | mac[5]) == 0) {
++        eth_hw_addr_random(dev);
++    } else {
++        eth_hw_addr_set(dev, mac);
++    }
+ 
+     /* Device information -- not available right now */
+     dev->irq = 0;
+@@ -8529,7 +8533,6 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+     bkn_priv_t *priv, *lpriv;
+     unsigned long flags;
+     int found, id;
+-    uint8_t *ma;
+ 
+     kmsg->hdr.type = KCOM_MSG_TYPE_RSP;
+ 
+@@ -8556,12 +8559,7 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+         return sizeof(kcom_msg_hdr_t);
+     }
+ 
+-    ma = kmsg->netif.macaddr;
+-    if ((ma[0] | ma[1] | ma[2] | ma[3] | ma[4] | ma[5]) == 0) {
+-        bkn_dev_mac[5]++;
+-        ma = bkn_dev_mac;
+-    }
+-    if ((dev = bkn_init_ndev(ma, kmsg->netif.name)) == NULL) {
++    if ((dev = bkn_init_ndev(kmsg->netif.macaddr, kmsg->netif.name)) == NULL) {
+         kmsg->hdr.status = KCOM_E_RESOURCE;
+         return sizeof(kcom_msg_hdr_t);
+     }
+-- 
+2.35.1
+
