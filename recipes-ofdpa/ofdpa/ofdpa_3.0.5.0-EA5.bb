@@ -1,65 +1,32 @@
 DESCRIPTION = ""
 LICENSE = "CLOSED"
 
-# Include SDK version, and OF-DPA and OpenBCM source revisions in version
-PV = "3.0.5.0-EA5+sdk-${SDK_VERSION}+gitAUTOINC+${@'${SRCREV_ofdpa}'[:10]}_${@'${SRCREV_sdk}'[:10]}"
+# this is machine specific
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PR = "r13"
 SDK_VERSION = "6.5.24"
 SRCREV_ofdpa = "56203d8d3f6c3d6805bbe43762394c75818e27ce"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 
-DEPENDS = "python3 onl"
+inherit systemd python3-dir
+
+include ofdpa.inc
+
+DEPENDS += "python3 onl"
+
 RDEPENDS_${PN} += "libgcc udev openbcm-gpl-modules"
 
 RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56370', '${PN}-firmware-bcm56370', '', d)}"
 RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${PN}-firmware-bcm56770', '', d)}"
 RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56870', '${PN}-firmware-bcm56870', '', d)}"
 
-# Nightly packages are regenerated regularily
-BB_STRICT_CHECKSUM = "0"
-
-# When building from the bisdn-linux repo, FEEDDOMAIN and FEEDURIPREFIX are
-# pulled in from
-# https://github.com/bisdn/meta-switch/blob/master/conf/distro/bisdn-linux.conf
-SRC_URI = " \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofagent_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56370_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56770_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/ofdpa-firmware-bcm56870_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${MACHINE_ARCH}/python3-ofdpa_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${MACHINE_ARCH}.ipk;subdir=${P} \
-"
-
-inherit bin_package systemd python3-dir
-
-# for some reason ipk doesn't trigger xz-native as a dependency
-do_unpack[depends] += " xz-native:do_populate_sysroot"
-
-# fails because no license file in the ipk
-deltask do_populate_lic
-
 SYSTEMD_PACKAGES = "${PN} ofagent"
 SYSTEMD_SERVICE_${PN} = "ofdpa.service"
 SYSTEMD_SERVICE_ofagent = "ofagent.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
-# systemd.class will append to existing presets, so remove them to avoid
-# duplicating their contents.
-do_install_append() {
-	rm -f ${D}/lib/systemd/system-preset/*
-}
-
-INSANE_SKIP_${PN} = "ldflags"
-INSANE_SKIP_ofagent = "ldflags"
 INSANE_SKIP_python3-${PN} = "ldflags"
-
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_SYSROOT_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT  = "1"
-
-# this is machine specific
-PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PACKAGES =+ "\
 	     ofagent \
