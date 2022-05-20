@@ -14,6 +14,7 @@ RDEPENDS_${PN} += "libgcc udev openbcm-gpl-modules"
 
 RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56370', '${PN}-firmware-bcm56370', '', d)}"
 RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${PN}-firmware-bcm56770', '', d)}"
+RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56870', '${PN}-firmware-bcm56870', '', d)}"
 
 # Nightly packages are regenerated regularily
 BB_STRICT_CHECKSUM = "0"
