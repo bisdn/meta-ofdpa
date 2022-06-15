@@ -26,12 +26,12 @@ deltask do_populate_lic
 
 # systemd.class will append to existing presets, so remove them to avoid
 # duplicating their contents.
-do_install_append() {
+do_install:append() {
 	rm -f ${D}/lib/systemd/system-preset/*
 }
 
-INSANE_SKIP_${PN} = "ldflags"
-INSANE_SKIP_ofagent = "ldflags"
+INSANE_SKIP:${PN} = "ldflags"
+INSANE_SKIP:ofagent = "ldflags"
 
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_SYSROOT_STRIP = "1"
