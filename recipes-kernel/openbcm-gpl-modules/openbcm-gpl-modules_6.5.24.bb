@@ -25,19 +25,19 @@ SRC_URI = " \
           file://patches/xgs_iproc_compat.patch \
           "
 
-SRC_URI_append_agema-ag7648 = " \
+SRC_URI:append:agema-ag7648 = " \
     file://linux_kernel_bde.conf \
 "
 
 S = "${WORKDIR}/src"
 
-FILES_${PN} += "\
+FILES:${PN} += "\
             ${sbindir}/bisdn-bcm-dev.sh \
             ${sysconfdir}/udev/rules.d/bisdn-bcm-dev.rules \
             "
-FILES_${PN}_append_agema-ag7648 = "${sysconfdir}/modprobe.d/linux_kernel_bde.conf"
+FILES:${PN}:append:agema-ag7648 = "${sysconfdir}/modprobe.d/linux_kernel_bde.conf"
 
-do_install_append() {
+do_install:append() {
 	# update path marker in udev rules
 	sed -i -e "s#SBINDIR#${sbindir}#" ${WORKDIR}/bisdn-bcm-dev.rules
 
@@ -47,7 +47,7 @@ do_install_append() {
 	install -m 0644 ${WORKDIR}/bisdn-bcm-dev.rules ${D}${sysconfdir}/udev/rules.d
 }
 
-do_install_append_agema-ag7648() {
+do_install:append:agema-ag7648() {
         install -d ${D}${sysconfdir}/modprobe.d/
         install -m 0644 ${WORKDIR}/*.conf ${D}${sysconfdir}/modprobe.d/
 }

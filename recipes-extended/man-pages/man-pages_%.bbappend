@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI += " \
   file://client_cfg_purge.1 \
@@ -15,7 +15,7 @@ SRC_URI += " \
   file://client_tunnel_dump.1 \
 "
 
-do_install_append() {
+do_install:append() {
   install -g 0 -o 0 -m 0644 ${WORKDIR}/client_*.1 ${D}${datadir}/man/man1/
   gzip ${D}${datadir}/man/man1/client_*.1
 }

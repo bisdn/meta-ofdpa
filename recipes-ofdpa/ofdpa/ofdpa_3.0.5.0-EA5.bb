@@ -15,18 +15,18 @@ include ofdpa.inc
 
 DEPENDS += "python3 onl"
 
-RDEPENDS_${PN} += "libgcc udev openbcm-gpl-modules"
+RDEPENDS:${PN} += "libgcc udev openbcm-gpl-modules"
 
-RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56370', '${PN}-firmware-bcm56370', '', d)}"
-RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${PN}-firmware-bcm56770', '', d)}"
-RDEPENDS_${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56870', '${PN}-firmware-bcm56870', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56370', '${PN}-firmware-bcm56370', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${PN}-firmware-bcm56770', '', d)}"
+RDEPENDS:${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56870', '${PN}-firmware-bcm56870', '', d)}"
 
 SYSTEMD_PACKAGES = "${PN} ofagent"
-SYSTEMD_SERVICE_${PN} = "ofdpa.service"
-SYSTEMD_SERVICE_ofagent = "ofagent.service"
+SYSTEMD_SERVICE:${PN} = "ofdpa.service"
+SYSTEMD_SERVICE:ofagent = "ofagent.service"
 SYSTEMD_AUTO_ENABLE = "enable"
 
-INSANE_SKIP_python3-${PN} = "ldflags"
+INSANE_SKIP:python3-${PN} = "ldflags"
 
 PACKAGES =+ "\
              ofagent \
@@ -36,7 +36,7 @@ PACKAGES =+ "\
              ${PN}-firmware-bcm56870 \
              "
 
-FILES_${PN} += "\
+FILES:${PN} += "\
             ${sbindir}/ofdpa \
             ${sysconfdir}/default/ofdpa \
             ${sysconfdir}/ofdpa \
@@ -45,30 +45,30 @@ FILES_${PN} += "\
             ${libdir}/librpc_client*${SOLIBS} \
             "
 
-FILES_ofagent = "${sbindir}/ofagent \
+FILES:ofagent = "${sbindir}/ofagent \
                  ${sysconfdir}/default/ofagent \
                  ${systemd_unitdir}/system/ofagent.service"
 
-FILES_python3-${PN} = " \
+FILES:python3-${PN} = " \
                       ${PYTHON_SITEPACKAGES_DIR} \
                       ${sbindir}/ofdpa*.py \
                       "
 
-FILES_${PN}-firmware-bcm56370 = " \
+FILES:${PN}-firmware-bcm56370 = " \
             ${nonarch_base_libdir}/firmware/brcm/bcm56370*.pkg \
             "
 
-FILES_${PN}-firmware-bcm56770 = " \
+FILES:${PN}-firmware-bcm56770 = " \
             ${nonarch_base_libdir}/firmware/brcm/bcm56770*.pkg \
             "
 
-FILES_${PN}-firmware-bcm56870 = " \
+FILES:${PN}-firmware-bcm56870 = " \
             ${nonarch_base_libdir}/firmware/brcm/bcm56870*.pkg \
             "
 
-CONFFILES_${PN} = " \
+CONFFILES:${PN} = " \
   ${sysconfdir}/default/ofdpa \
   ${sysconfdir}/ofdpa/rc.soc \
 "
 
-CONFFILES_ofagent = "${sysconfdir}/default/ofagent"
+CONFFILES:ofagent = "${sysconfdir}/default/ofagent"

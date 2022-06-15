@@ -20,9 +20,9 @@ inherit systemd bin_package
 # for some reason ipk doesn't trigger xz-native as a dependency
 do_unpack[depends] += " xz-native:do_populate_sysroot"
 
-SYSTEMD_SERVICE_${PN}_append = "ofdpa-grpc.service"
+SYSTEMD_SERVICE:${PN}:append = "ofdpa-grpc.service"
 
-INSANE_SKIP_${PN} = "ldflags"
+INSANE_SKIP:${PN} = "ldflags"
 
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_SYSROOT_STRIP = "1"
@@ -30,6 +30,6 @@ INHIBIT_PACKAGE_DEBUG_SPLIT  = "1"
 
 # systemd.class will append to existing presets, so remove them to avoid
 # duplicating their contents.
-do_install_append() {
+do_install:append() {
 	rm -f ${D}/lib/systemd/system-preset/*
 }
