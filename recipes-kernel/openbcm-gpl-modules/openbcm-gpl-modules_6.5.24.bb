@@ -1,4 +1,4 @@
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = " \
 	file://systems/bde/linux/user/kernel/linux-user-bde.c;endline=15;md5=ac2e812a539f3a9b3802636f1d3ef09c \
 	file://systems/bde/linux/kernel/linux-kernel-bde.c;endline=15;md5=ac2e812a539f3a9b3802636f1d3ef09c \
