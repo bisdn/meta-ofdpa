@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PR = "r16"
+PR = "r17"
 SDK_VERSION = "6.5.24"
 SRCREV_ofdpa = "56203d8d3f6c3d6805bbe43762394c75818e27ce"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
