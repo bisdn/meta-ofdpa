@@ -4,9 +4,9 @@ LICENSE = "CLOSED"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PR = "r20"
+PR = "r21"
 SDK_VERSION = "6.5.24"
-SRCREV_ofdpa = "24ba7ed18e0c837e2f6b363740dca499aa46af02"
+SRCREV_ofdpa = "23025dc2048802924973b17748ef04625158c01c"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 
 inherit systemd python3-dir
@@ -43,6 +43,7 @@ FILES:${PN} += "\
             ${systemd_unitdir}/system/ofdpa.service \
             ${sbindir}/client* \
             ${libdir}/librpc_client*${SOLIBS} \
+            ${datadir}/ofdpa/rc.soc \
             "
 
 FILES:ofagent = "${sbindir}/ofagent \
