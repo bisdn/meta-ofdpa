@@ -4,15 +4,15 @@ Date: Mon, 14 Dec 2020 15:54:54 +0100
 Subject: [PATCH 3/3] linux-kernel-bde: update API usage for 5.10
 
 ---
- systems/bde/linux/include/linux_dma.h          | 2 +-
- systems/bde/linux/kernel/linux_dma.c           | 4 ++--
- systems/bde/linux/user/kernel/linux-user-bde.c | 2 +-
+ sdk-6.5.24/systems/bde/linux/include/linux_dma.h          | 2 +-
+ sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c           | 4 ++--
+ sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c | 2 +-
  3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/systems/bde/linux/include/linux_dma.h b/systems/bde/linux/include/linux_dma.h
+diff --git a/sdk-6.5.24/systems/bde/linux/include/linux_dma.h b/sdk-6.5.24/systems/bde/linux/include/linux_dma.h
 index da53be260..e94172ae2 100755
---- a/systems/bde/linux/include/linux_dma.h
-+++ b/systems/bde/linux/include/linux_dma.h
+--- a/sdk-6.5.24/systems/bde/linux/include/linux_dma.h
++++ b/sdk-6.5.24/systems/bde/linux/include/linux_dma.h
 @@ -23,7 +23,7 @@
  /* ioremap is broken in kernel */
  #define IOREMAP(addr, size) ((void *)KSEG1ADDR(addr))
@@ -22,10 +22,10 @@ index da53be260..e94172ae2 100755
  #endif
  
  #if defined (__mips__)
-diff --git a/systems/bde/linux/kernel/linux_dma.c b/systems/bde/linux/kernel/linux_dma.c
+diff --git a/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c b/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c
 index 475e3a8b6..59afda586 100644
---- a/systems/bde/linux/kernel/linux_dma.c
-+++ b/systems/bde/linux/kernel/linux_dma.c
+--- a/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c
++++ b/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c
 @@ -1245,7 +1245,7 @@ _sinval(int d, void *ptr, int length)
  #if defined(dma_cache_wback_inv)
       dma_cache_wback_inv((unsigned long)ptr, length);
@@ -44,10 +44,10 @@ index 475e3a8b6..59afda586 100644
      
      dma_sync_single_for_cpu(NULL, (unsigned long)ptr, length, DMA_BIDIRECTIONAL);
  #else
-diff --git a/systems/bde/linux/user/kernel/linux-user-bde.c b/systems/bde/linux/user/kernel/linux-user-bde.c
+diff --git a/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c b/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c
 index 7628fd92c..141bd53da 100644
---- a/systems/bde/linux/user/kernel/linux-user-bde.c
-+++ b/systems/bde/linux/user/kernel/linux-user-bde.c
+--- a/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c
++++ b/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c
 @@ -136,7 +136,7 @@ MODULE_LICENSE("GPL");
  #define HX5_INTC_INTR_STATUS_BASE          (HX5_INTC_INTR_STATUS_REG0)
  #define HX5_INTC_INTR_RAW_STATUS_BASE      (HX5_INTC_INTR_RAW_STATUS_REG0)
