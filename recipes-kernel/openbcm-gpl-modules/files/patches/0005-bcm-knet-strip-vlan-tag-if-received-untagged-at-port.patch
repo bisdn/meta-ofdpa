@@ -18,10 +18,10 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 121 +++++++++++++-----
  1 file changed, 90 insertions(+), 31 deletions(-)
 
-diff --git a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 index 025c6d759..84f63b5f8 100755
---- a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-+++ b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 @@ -2097,6 +2097,42 @@ bkn_dump_pkt(uint8_t *data, int size, int txrx)
      }
  }

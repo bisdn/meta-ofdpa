@@ -20,10 +20,10 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  .../linux/kernel/modules/bcm-knet/bcm-knet.c       | 14 ++++++--------
  1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 index b4038f18f..7046770c7 100755
---- a/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-+++ b/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 @@ -6804,7 +6804,11 @@ bkn_init_ndev(u8 *mac, char *name)
  #endif
  

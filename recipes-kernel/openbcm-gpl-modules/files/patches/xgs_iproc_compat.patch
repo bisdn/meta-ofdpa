@@ -1,7 +1,7 @@
-diff --git a/systems/bde/linux/kernel/linux-kernel-bde.c b/systems/bde/linux/kernel/linux-kernel-bde.c
+diff --git a/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c b/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c
 index d036d2294..879297c18 100644
---- a/systems/bde/linux/kernel/linux-kernel-bde.c
-+++ b/systems/bde/linux/kernel/linux-kernel-bde.c
+--- a/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c
++++ b/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c
 @@ -64,6 +64,9 @@
  #define msi_control_reg(base)         (base + PCI_MSI_FLAGS)
  #endif
