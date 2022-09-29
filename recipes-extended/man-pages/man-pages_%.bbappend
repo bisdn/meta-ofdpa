@@ -17,5 +17,5 @@ SRC_URI += " \
 
 do_install:append() {
   install -g 0 -o 0 -m 0644 ${WORKDIR}/client_*.1 ${D}${datadir}/man/man1/
-  gzip ${D}${datadir}/man/man1/client_*.1
+  gzip -f ${D}${datadir}/man/man1/client_*.1
 }
