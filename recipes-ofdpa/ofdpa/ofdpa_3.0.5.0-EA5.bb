@@ -6,7 +6,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 PR = "r27"
 SDK_VERSION = "6.5.24"
-SRCREV_ofdpa = "c860f125285a7683fe97f52941911edd63ed7c98"
+SRCREV_ofdpa = "ba529fe841112aca30c1ad69d8526151d99c1873"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 
 inherit systemd python3-dir
