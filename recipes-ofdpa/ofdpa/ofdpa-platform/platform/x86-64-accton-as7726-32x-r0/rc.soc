@@ -1,0 +1,5 @@
+# For now embedded into OF-DPA
+# m0 load 0 0x3800 /usr/share/ofdpa/platform/x86-64-accton-as7726-32x-r0/custom_led.bin
+led leddata /usr/share/ofdpa/led/cmicx_legacy.json
+led auto on
+led start
