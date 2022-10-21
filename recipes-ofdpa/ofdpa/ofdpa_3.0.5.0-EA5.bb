@@ -1,10 +1,7 @@
 DESCRIPTION = ""
 LICENSE = "CLOSED"
 
-# this is machine specific
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
-PR = "r30"
+PR = "r31"
 SDK_VERSION = "6.5.24"
 SRCREV_ofdpa = "3d2e4d63fdfc81f5b3423c27a8410d011f20a700"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
@@ -15,11 +12,13 @@ include ofdpa.inc
 
 DEPENDS += "python3 onl"
 
-RDEPENDS:${PN} += "libgcc udev openbcm-gpl-modules"
+RDEPENDS:${PN} += "libgcc udev openbcm-gpl-modules ofdpa-platform"
 
-RDEPENDS:${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56370', '${PN}-firmware-bcm56370', '', d)}"
-RDEPENDS:${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56770', '${PN}-firmware-bcm56770', '', d)}"
-RDEPENDS:${PN} += " ${@bb.utils.contains('OFDPA_SWITCH_SUPPORT', 'BCM56870', '${PN}-firmware-bcm56870', '', d)}"
+RDEPENDS:${PN}:append:x86-64 = " \
+             ${PN}-firmware-bcm56370 \
+             ${PN}-firmware-bcm56770 \
+             ${PN}-firmware-bcm56870 \
+"
 
 SYSTEMD_PACKAGES = "${PN} ofagent"
 SYSTEMD_SERVICE:${PN} = "ofdpa.service"
@@ -44,8 +43,6 @@ FILES:${PN} += "\
             ${sbindir}/client* \
             ${libdir}/librpc_client*${SOLIBS} \
             ${datadir}/ofdpa/rc.soc \
-            ${datadir}/ofdpa/led/cmicx_accton.json \
-            ${datadir}/ofdpa/led/cmicx_legacy.json \
             "
 
 FILES:ofagent = "${sbindir}/ofagent \
