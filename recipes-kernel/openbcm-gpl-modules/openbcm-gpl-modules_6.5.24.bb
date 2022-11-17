@@ -23,7 +23,6 @@ SRC_URI = " \
           file://patches/0009-bcm-knet-fix-race-between-creation-and-open.patch;striplevel=2 \
           file://patches/0010-bcm-knet-use-fully-randomized-mac-addresses.patch;striplevel=2 \
           file://patches/0011-bcm-knet-allow-marking-packets-as-offloaded.patch;striplevel=2 \
-          file://patches/xgs_iproc_compat.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \
