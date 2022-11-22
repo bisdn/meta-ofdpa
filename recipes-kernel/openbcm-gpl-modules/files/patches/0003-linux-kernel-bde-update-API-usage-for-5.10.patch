@@ -1,7 +1,7 @@
-From 064ad352af78a6f91a891332e9b42ab6a7e9e4a0 Mon Sep 17 00:00:00 2001
+From d4e7aed84944407c97e6a9413e98048789f7cac2 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:54:54 +0100
-Subject: [PATCH 3/3] linux-kernel-bde: update API usage for 5.10
+Subject: [PATCH 03/14] linux-kernel-bde: update API usage for 5.10
 
 ---
  sdk-6.5.24/systems/bde/linux/include/linux_dma.h          | 2 +-
@@ -10,7 +10,7 @@ Subject: [PATCH 3/3] linux-kernel-bde: update API usage for 5.10
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/sdk-6.5.24/systems/bde/linux/include/linux_dma.h b/sdk-6.5.24/systems/bde/linux/include/linux_dma.h
-index da53be260..e94172ae2 100755
+index da53be260839..e94172ae28c9 100755
 --- a/sdk-6.5.24/systems/bde/linux/include/linux_dma.h
 +++ b/sdk-6.5.24/systems/bde/linux/include/linux_dma.h
 @@ -23,7 +23,7 @@
@@ -23,7 +23,7 @@ index da53be260..e94172ae2 100755
  
  #if defined (__mips__)
 diff --git a/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c b/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c
-index 475e3a8b6..59afda586 100644
+index 475e3a8b6b96..59afda5867f3 100644
 --- a/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c
 +++ b/sdk-6.5.24/systems/bde/linux/kernel/linux_dma.c
 @@ -1245,7 +1245,7 @@ _sinval(int d, void *ptr, int length)
@@ -45,7 +45,7 @@ index 475e3a8b6..59afda586 100644
      dma_sync_single_for_cpu(NULL, (unsigned long)ptr, length, DMA_BIDIRECTIONAL);
  #else
 diff --git a/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c b/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c
-index 7628fd92c..141bd53da 100644
+index 7628fd92c414..141bd53dade6 100644
 --- a/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c
 +++ b/sdk-6.5.24/systems/bde/linux/user/kernel/linux-user-bde.c
 @@ -136,7 +136,7 @@ MODULE_LICENSE("GPL");
@@ -58,5 +58,5 @@ index 7628fd92c..141bd53da 100644
  #define HX5_IHOST_GICD_ISENABLERN_0        (0x10781100)
  #define HX5_IHOST_GICD_ISENABLERN_1        (0x10781104)
 -- 
-2.33.0
+2.38.1
 

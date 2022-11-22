@@ -1,0 +1,63 @@
+From 705c19e8532da3bed7284eab3dc08ccd1c2e64b8 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Fri, 18 Nov 2022 16:46:01 +0100
+Subject: [PATCH 13/14] bcm-knet: update API for kernel 5.19
+
+Update kernel API usage for 5.18 and 5.19:
+
+5.18 dropped pci_set_dma_mask(), which was just a wrapper for
+dma_set_mask(), so just call dma_set_mask() directly.
+
+5.19 dropped the weight argument from netif_napi_add() as most users
+just passed the default value, and added a new call
+netif_napi_add_weight() for passing a custom weight value.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c     | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 3abacd4a1f1e..d5b3338d7c26 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -302,6 +302,18 @@ static int napi_weight = 0;
+ 
+ /* Compatibility */
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,19,0))
++#define NETIF_NAPI_ADD(dev, napi, poll, weight) netif_napi_add((dev), (napi), (poll), (weight))
++#else
++#define NETIF_NAPI_ADD(dev, napi, poll, weight) netif_napi_add_weight((dev), (napi), (poll), (weight))
++#endif
++
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(5,18,0))
++#define PCI_SET_DMA_MASK(pdev, mask) pci_set_dma_mask((pdev), (mask))
++#else
++#define PCI_SET_DMA_MASK(pdev, mask) dma_set_mask(&(pdev)->dev, (mask))
++#endif
++
+ #if (LINUX_VERSION_CODE < KERNEL_VERSION(4,7,0))
+ #define NETDEV_UPDATE_TRANS_START_TIME(dev) dev->trans_start = jiffies
+ #else
+@@ -8432,7 +8444,7 @@ bkn_knet_hw_init(kcom_msg_hw_init_t *kmsg, int len)
+     /* Ensure 32-bit PCI DMA is mapped properly on 64-bit platforms */
+     dev_type = kernel_bde->get_dev_type(sinfo->dev_no);
+     if (dev_type & BDE_PCI_DEV_TYPE && sinfo->cmic_type != 'x') {
+-        if (pci_set_dma_mask(sinfo->pdev, 0xffffffff)) {
++        if (PCI_SET_DMA_MASK(sinfo->pdev, 0xffffffff)) {
+             cfg_api_unlock(sinfo, &flags);
+             gprintk("No suitable DMA available for SKBs\n");
+             kmsg->hdr.status = KCOM_E_RESOURCE;
+@@ -9571,7 +9583,7 @@ bkn_knet_dev_init(int d)
+     }
+ 
+     if (use_napi) {
+-        netif_napi_add(dev, &sinfo->napi, bkn_poll, napi_weight);
++        NETIF_NAPI_ADD(dev, &sinfo->napi, bkn_poll, napi_weight);
+     }
+     return 0;
+ }
+-- 
+2.38.1
+

@@ -1,7 +1,7 @@
-From ece765ce272a2467075a29a4ad031602f52f31ae Mon Sep 17 00:00:00 2001
+From 8b2a4663c3201ecf3cb6b5398cb045be677698ac Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 16:02:44 +0100
-Subject: [PATCH 2/3] kernel-modules: add dropped defines to work with 5.9+
+Subject: [PATCH 02/14] kernel-modules: add dropped defines to work with 5.9+
 
 Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  1 file changed, 4 insertions(+)
 
 diff --git a/sdk-6.5.24/systems/linux/kernel/modules/include/lkm.h b/sdk-6.5.24/systems/linux/kernel/modules/include/lkm.h
-index 141029494..0b2dab92f 100644
+index 1410294944eb..0b2dab92fda4 100644
 --- a/sdk-6.5.24/systems/linux/kernel/modules/include/lkm.h
 +++ b/sdk-6.5.24/systems/linux/kernel/modules/include/lkm.h
 @@ -36,6 +36,10 @@
@@ -24,5 +24,5 @@ index 141029494..0b2dab92f 100644
  /* Helper defines for multi-version kernel  support */
  #if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0)
 -- 
-2.33.0
+2.38.1
 
