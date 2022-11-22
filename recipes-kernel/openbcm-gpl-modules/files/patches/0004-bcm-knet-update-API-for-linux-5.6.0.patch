@@ -1,5 +1,14 @@
+From 2b71b921c784b5a083e81bbd463bb8430d86962f Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Fri, 18 Nov 2022 16:12:08 +0100
+Subject: [PATCH 04/14] bcm-knet: update API for linux 5.6.0
+
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 71 ++++++++++++++++++-
+ 1 file changed, 69 insertions(+), 2 deletions(-)
+
 diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index 025c6d759..b701c38c2 100755
+index 025c6d759840..b701c38c2027 100755
 --- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 +++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 @@ -6861,6 +6861,15 @@ bkn_proc_link_write(struct file *file, const char *buf,
@@ -171,3 +180,6 @@ index 025c6d759..b701c38c2 100755
  
  static int
  bkn_proc_init(void)
+-- 
+2.38.1
+

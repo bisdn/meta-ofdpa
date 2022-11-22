@@ -1,0 +1,45 @@
+From 9a144ef3b6d4b6695edbcabfa6c40b02a641f910 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 21 Nov 2022 12:01:36 +0100
+Subject: [PATCH 14/14] linux-kernel-bde: use platform_get_irq()
+
+The Kernel stopped providing platform resources for IRQs of device tree
+backed platform devices[1], and instead requires calling
+platform_get_irq(), so do that. This also simplifies the code.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a1a2b7125e1079cfcc13a116aa3af3df2f9e002b
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c b/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c
+index 1c778e5be06b..65d2b1aee410 100644
+--- a/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c
++++ b/sdk-6.5.24/systems/bde/linux/kernel/linux-kernel-bde.c
+@@ -795,10 +795,7 @@ iproc_cmicd_probe(struct platform_device *pldev)
+         int i;
+         memset(iproc_cmicx_irqs, 0, IHOST_CMICX_MAX_INTRS*sizeof(uint32_t));
+         for (i = 0; i < IHOST_CMICX_MAX_INTRS; i++) {
+-            irqres = iproc_platform_get_resource(pldev, IORESOURCE_IRQ, i);
+-            if (irqres) {
+-                iproc_cmicx_irqs[i] = irqres->start;
+-            }
++            iproc_cmicx_irqs[i] = platform_get_irq(pldev, i);
+             if (debug >= 1) {
+                 gprintk("iproc_cmicx_irqs[%d] = %d\n", i, iproc_cmicx_irqs[i]);
+             }
+@@ -807,8 +804,7 @@ iproc_cmicd_probe(struct platform_device *pldev)
+     } else
+ #endif
+     {
+-        irqres = iproc_platform_get_resource(pldev, IORESOURCE_IRQ, 0);
+-        ctrl->iLine = irqres->start;
++        ctrl->iLine = platform_get_irq(pldev, 0);
+     }
+ 
+     ctrl->isr = NULL;
+-- 
+2.38.1
+

@@ -1,7 +1,7 @@
-From 8dc240ab30a054fb825d58b0a25a84aa516ca681 Mon Sep 17 00:00:00 2001
+From 2d2a622e51f16fd61728f62562974d3fe60b6188 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 7 Feb 2022 14:28:11 +0100
-Subject: [PATCH 2/3] bcm-knet: allow setting speed/duplex
+Subject: [PATCH 07/14] bcm-knet: allow setting speed/duplex
 
 To allow better emulation of physical port devices, extend the link
 state settings to also include link speed and duplex.
@@ -15,7 +15,7 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  1 file changed, 39 insertions(+), 9 deletions(-)
 
 diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index 7083a5f59..03b06fe20 100755
+index e03de2b76fa3..eecd60db14e8 100755
 --- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 +++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 @@ -960,6 +960,9 @@ typedef struct bkn_priv_s {
@@ -115,5 +115,5 @@ index 7083a5f59..03b06fe20 100755
              spin_unlock_irqrestore(&sinfo->lock, flags);
              return count;
 -- 
-2.35.1
+2.38.1
 

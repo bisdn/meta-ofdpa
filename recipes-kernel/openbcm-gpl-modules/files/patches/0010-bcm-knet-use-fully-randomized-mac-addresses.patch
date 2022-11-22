@@ -1,7 +1,7 @@
-From df20798becb4e6d2feda60b086c7ce5c1b9e4f68 Mon Sep 17 00:00:00 2001
+From 1c59f49b1cd6d1ba9cc4206cfa69d2593bc3258c Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 25 Apr 2022 10:48:26 +0200
-Subject: [PATCH] bcm-knet: use fully randomized mac addresses
+Subject: [PATCH 10/14] bcm-knet: use fully randomized mac addresses
 
 Instead of using partially randomized mac addresses with a Broadcom OUI
 prefix, use fully randomized mac addresses for generated virtualized
@@ -21,7 +21,7 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index b4038f18f..7046770c7 100755
+index 9b347a6fe928..329f1066a511 100755
 --- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 +++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 @@ -6804,7 +6804,11 @@ bkn_init_ndev(u8 *mac, char *name)
@@ -37,7 +37,7 @@ index b4038f18f..7046770c7 100755
  
      /* Device information -- not available right now */
      dev->irq = 0;
-@@ -8529,7 +8533,6 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+@@ -8596,7 +8600,6 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
      bkn_priv_t *priv, *lpriv;
      unsigned long flags;
      int found, id;
@@ -45,7 +45,7 @@ index b4038f18f..7046770c7 100755
  
      kmsg->hdr.type = KCOM_MSG_TYPE_RSP;
  
-@@ -8556,12 +8559,7 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+@@ -8623,12 +8626,7 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
          return sizeof(kcom_msg_hdr_t);
      }
  
@@ -60,5 +60,5 @@ index b4038f18f..7046770c7 100755
          return sizeof(kcom_msg_hdr_t);
      }
 -- 
-2.35.1
+2.38.1
 
