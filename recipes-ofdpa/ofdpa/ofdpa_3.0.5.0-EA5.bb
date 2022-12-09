@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PR = "r28"
+PR = "r29"
 SDK_VERSION = "6.5.24"
 SRCREV_ofdpa = "3d2e4d63fdfc81f5b3423c27a8410d011f20a700"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
@@ -44,6 +44,8 @@ FILES:${PN} += "\
             ${sbindir}/client* \
             ${libdir}/librpc_client*${SOLIBS} \
             ${datadir}/ofdpa/rc.soc \
+            ${datadir}/ofdpa/led/cmicx_accton.json \
+            ${datadir}/ofdpa/led/cmicx_legacy.json \
             "
 
 FILES:ofagent = "${sbindir}/ofagent \
