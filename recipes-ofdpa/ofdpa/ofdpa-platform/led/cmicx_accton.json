@@ -1,0 +1,46 @@
+[
+	{
+		"speed": 10,
+		"value": "0x3"
+	},
+	{
+		"speed": 100,
+		"value": "0x5"
+	},
+	{
+		"speed": 1000,
+		"value": "0x7"
+	},
+	{
+		"speed": 2500,
+		"value": "0x9"
+	},
+	{
+		"speed": 10000,
+		"value": "0xb"
+	},
+	{
+		"speed": 25000,
+		"value": "0xd"
+	},
+	{
+		"speed": 40000,
+		"value": "0xf"
+	},
+	{
+		"speed": 50000,
+		"value": "0x11"
+	},
+	{
+		"speed": 100000,
+		"value": "0x13"
+	},
+	{
+		"speed": 200000,
+		"value": "0x15"
+	},
+	{
+		"speed": 400000,
+		"value": "0x17"
+	}
+]
