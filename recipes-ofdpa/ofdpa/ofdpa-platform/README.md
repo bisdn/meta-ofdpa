@@ -42,3 +42,12 @@ m0 load 0 0x3800 /usr/share/ofdpa/platform/x86-64-vendor-device-r0/custom_led.bi
 
 Since the firmware is a program protected by copyright, it needs to be
 appropriately licensed and this licence needs to be documented in WHENCE.
+
+=== custom LED data formats ===
+
+To configure data supplied from OF-DPA to the LED firmware, OF-DPA supports a
+custom `rc.soc` `led` subcommand `leddata`. It takes a path to a JSON encoded
+file with a simple array of speed/value pairs.
+
+See `/usr/share/data/ofdpa/led/cmicx_legacy.json` as an example for the format
+and values used by Switch SDK 6.5.16 and earlier for CMICx platforms.
