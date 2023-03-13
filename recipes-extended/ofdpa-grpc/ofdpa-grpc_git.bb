@@ -1,35 +1,13 @@
 LICENSE = "CLOSED"
 
-# Nightly packages are regenerated regularily
-BB_STRICT_CHECKSUM = "0"
+inherit systemd
 
-SRC_URI = " \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
-"
+include ofdpa-grpc.inc
 
-# Manually calculate expanded ${SRCPV} value
-PV = "0.4+gitAUTOINC+${@'${SRCREV}'[0:10]}"
 SRCREV = "84a188a00256e0a6ad502970de524a6485f1bf4b"
 
-DEPENDS = "grpc gflags glog protobuf openssl ofdpa"
-
-
-
-inherit systemd bin_package
-
-# for some reason ipk doesn't trigger xz-native as a dependency
-do_unpack[depends] += " xz-native:do_populate_sysroot"
+DEPENDS += "grpc gflags glog protobuf openssl ofdpa"
 
 SYSTEMD_SERVICE:${PN}:append = "ofdpa-grpc.service"
 
 INSANE_SKIP:${PN} = "ldflags"
-
-INHIBIT_PACKAGE_STRIP = "1"
-INHIBIT_SYSROOT_STRIP = "1"
-INHIBIT_PACKAGE_DEBUG_SPLIT  = "1"
-
-# systemd.class will append to existing presets, so remove them to avoid
-# duplicating their contents.
-do_install:append() {
-	rm -f ${D}/lib/systemd/system-preset/*
-}
