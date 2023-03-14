@@ -25,6 +25,7 @@ inherit allarch
 SONIC_CUSTOM_LEDS = "\
     accton/x86_64-accton_as4630_54pe-r0 \
     accton/x86_64-accton_as5835_54x-r0 \
+    accton/x86_64-accton_as7726_32x-r0 \
 "
 
 FILES:${PN} = " \
