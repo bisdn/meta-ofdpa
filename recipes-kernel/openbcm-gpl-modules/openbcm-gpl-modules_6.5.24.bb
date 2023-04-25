@@ -55,7 +55,8 @@ do_install:append:agema-ag7648() {
         install -m 0644 ${WORKDIR}/*.conf ${D}${sysconfdir}/modprobe.d/
 }
 
-KERNEL_MODULE_AUTOLOAD += " linux-kernel-bde linux-user-bde linux-bcm-knet"
+KERNEL_MODULE_PROBECONF:append = " linux-kernel-bde"
+module_conf_linux-kernel-bde = "softdep linux-kernel-bde post: linux-user-bde linux-bcm-knet"
 
 # The inherit of module.bbclass will automatically name module packages with
 # "kernel-module-" prefix as required by the oe-core build environment.
