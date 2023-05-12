@@ -6,7 +6,7 @@ SRC_URI = " \
 "
 
 # Manually calculate expanded ${SRCPV} value
-PV = "0.4+gitAUTOINC+${@'${SRCREV}'[0:10]}"
+PV:append = "+gitAUTOINC+${@'${SRCREV}'[0:10]}"
 
 inherit bin_package
 
