@@ -1,5 +1,5 @@
 # Include SDK version, and OF-DPA and OpenBCM source revisions in version
-PV = "3.0.5.0-EA5+sdk-${SDK_VERSION}+gitAUTOINC+${@'${SRCREV_ofdpa}'[:10]}_${@'${SRCREV_sdk}'[:10]}"
+PV:append = "+sdk-${SDK_VERSION}+gitAUTOINC+${@'${SRCREV_ofdpa}'[:10]}_${@'${SRCREV_sdk}'[:10]}"
 
 # Nightly packages are regenerated regularily
 BB_STRICT_CHECKSUM = "0"
