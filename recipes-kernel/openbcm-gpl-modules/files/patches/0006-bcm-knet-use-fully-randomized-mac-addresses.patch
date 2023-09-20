@@ -1,7 +1,7 @@
-From 1c59f49b1cd6d1ba9cc4206cfa69d2593bc3258c Mon Sep 17 00:00:00 2001
+From cc9a5e516da88f6ee12b837d62601d26d7999801 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 25 Apr 2022 10:48:26 +0200
-Subject: [PATCH 10/14] bcm-knet: use fully randomized mac addresses
+Subject: [PATCH 06/11] bcm-knet: use fully randomized mac addresses
 
 Instead of using partially randomized mac addresses with a Broadcom OUI
 prefix, use fully randomized mac addresses for generated virtualized
@@ -20,11 +20,11 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  .../linux/kernel/modules/bcm-knet/bcm-knet.c       | 14 ++++++--------
  1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index 9b347a6fe928..329f1066a511 100755
---- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-+++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-@@ -6804,7 +6804,11 @@ bkn_init_ndev(u8 *mac, char *name)
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index e14f7f2d7e02..ffbf77958a94 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -7026,7 +7026,11 @@ bkn_init_ndev(u8 *mac, char *name)
  #endif
  
      /* Set the device MAC address */
@@ -37,7 +37,7 @@ index 9b347a6fe928..329f1066a511 100755
  
      /* Device information -- not available right now */
      dev->irq = 0;
-@@ -8596,7 +8600,6 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+@@ -8758,7 +8762,6 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
      bkn_priv_t *priv, *lpriv;
      unsigned long flags;
      int found, id;
@@ -45,7 +45,7 @@ index 9b347a6fe928..329f1066a511 100755
  
      kmsg->hdr.type = KCOM_MSG_TYPE_RSP;
  
-@@ -8623,12 +8626,7 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+@@ -8785,12 +8788,7 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
          return sizeof(kcom_msg_hdr_t);
      }
  
@@ -60,5 +60,5 @@ index 9b347a6fe928..329f1066a511 100755
          return sizeof(kcom_msg_hdr_t);
      }
 -- 
-2.38.1
+2.42.0
 

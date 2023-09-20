@@ -3,10 +3,9 @@
  * 
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenBCM/master/Legal/LICENSE file.
  * 
- * Copyright 2007-2021 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2022 Broadcom Inc. All rights reserved.
  *
  * Linux Broadcom Device Enumerators
- *
  *
  * There are two Linux BDEs:
  *
@@ -36,7 +35,9 @@
  *	and debugging process is about a gillion times easier. 
  *	After the core logic is debugged, it can be retargeted using
  *	only the kernel bde and run in the kernel. 
- */
+ *	
+ *
+ **********************************************************************/
 
 #ifndef __LINUX_BDE_H__
 #define __LINUX_BDE_H__
@@ -54,6 +55,7 @@
  * They are defined here, along with the module names, 
  * to document them if you need to mknod them (or open) them, 
  * and to keep them unique. 
+ *
  */
 
 #include <linux/version.h>
@@ -155,6 +157,7 @@ extern int linux_bde_instance_config(linux_bde_device_bitmap_t dev_mask,unsigned
 
 /*
  *  Backdoors provided by the kernel bde
+ *
  */
 
 /*
@@ -241,6 +244,9 @@ extern int lkbde_cpu_read(int d, uint32 addr, uint32 *buf);
 extern int lkbde_cpu_pci_register(int d);
 #endif
 
+extern int lkbde_intr_cb_register(int d,
+                                  int (*intr_pending)(void*),
+                                  void *intr_pending_data);
 /*
  * This flag must be OR'ed onto the device number when calling
  * interrupt_connect/disconnect and irq_mask_set functions from

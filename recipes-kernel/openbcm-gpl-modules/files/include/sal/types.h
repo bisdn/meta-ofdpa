@@ -2,7 +2,7 @@
  * 
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenBCM/master/Legal/LICENSE file.
  * 
- * Copyright 2007-2021 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2022 Broadcom Inc. All rights reserved.
  *
  * File:     types.h
  * Purpose:     SAL type definitions
@@ -81,13 +81,13 @@ typedef COMPILER_INT64    int64;        /* 64-bit quantity */
 
 /*******************************************
  * SET ALL BITS, BEGINNING AT BIT X, TO 1  *
- */
+ *******************************************/
 #define SAL_FROM_BIT(x)     (SAL_RBIT(x) + 1)
 
 /*******************************************
  * SET ALL BITS UP TO BIT X (NOT INCLUDING *
  * BIT X) TO 1.                            *
- */
+ *******************************************/
 #define SAL_UPTO_BIT(x)     (~(SAL_FROM_BIT(x)))
 
 /**************************************************************
@@ -97,7 +97,7 @@ typedef COMPILER_INT64    int64;        /* 64-bit quantity */
  * 'Y' IS THE THE ELEMENT (IN THE STRUCTURE) WHOSE            *
  *     OFFSET WE NEED.                                        *
  * THE OFFSET RETURNS AS 'unsigned long'.                     *
- */
+ **************************************************************/
 #define SAL_OFFSETOF(x,y) ((unsigned long)(&(((x *)0)->y)))
 
 /**************************************************************
@@ -107,7 +107,7 @@ typedef COMPILER_INT64    int64;        /* 64-bit quantity */
  * 'Y' IS THE  ELEMENT (IN THE STRUCTURE) WHOSE               *
  *     SIZE (IN BYTES) WE NEED.                               *
  * THE SIZE RETURNS AS 'unsigned long'.                       *
- */
+ **************************************************************/
 #define SAL_SIZEOF(x,y) ((unsigned long)(sizeof(((x *)0)->y)))
 
 #define BITS2BYTES(x)        (((x) + 7) / 8)
@@ -277,6 +277,7 @@ typedef uint8   sal_ip6_addr_t[SAL_IP6_ADDRLEN];    /* IPv6 Address */
 #define SAL_EMMI_DEV_TYPE       0x10000 /* EMMI device */
 #define SAL_COMPOSITE_DEV_TYPE  0x20000 /* Composite device, composed of sub-devices with buses */
 #define SAL_USER_DEV_TYPE       0x40000 /* User implemented method of access to the device */
+#define SAL_SUB_DEV_TYPE        0x80000 /* A sub-device (with a bus) of a composite device */
 #define SAL_DEV_BUS_TYPE_MASK   0xf00ff /* Odd for historical reasons */
 
 /* Device types */

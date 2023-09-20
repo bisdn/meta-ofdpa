@@ -1,0 +1,27 @@
+From 2d1f0ecb6a799b2420f19ed479b0b3ab037fa17f Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 7 Feb 2022 12:11:54 +0100
+Subject: [PATCH 02/11] bcm-knet: report link state
+
+We set netif carrier, so we can just use ethtool_op_get_link.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index c86a651827ca..16d62862e8a8 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -6993,6 +6993,7 @@ bkn_set_link_ksettings(struct net_device *netdev,
+ 
+ static const struct ethtool_ops bkn_ethtool_ops = {
+     .get_drvinfo        = bkn_get_drvinfo,
++    .get_link           = ethtool_op_get_link,
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0))
+     .get_ts_info        = bkn_get_ts_info,
+ #endif
+-- 
+2.42.0
+

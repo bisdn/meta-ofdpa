@@ -1,7 +1,7 @@
-From c03281e4a0fc0ce564df368875f9c009c1ebc0f7 Mon Sep 17 00:00:00 2001
+From ba9e4171aa2cf6906f958893f7e82915699aa6ab Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 26 Sep 2022 10:34:45 +0200
-Subject: [PATCH 11/14] bcm-knet: allow marking packets as offloaded
+Subject: [PATCH 07/11] bcm-knet: allow marking packets as offloaded
 
 When using KNET interfaces in a bridge, Linux will flood or forward any
 packets it sees according to default rules. This can be undesirable when
@@ -18,24 +18,23 @@ this an optional flag per interface.
 
 Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
 ---
- .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 22 ++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 21 ++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index 329f1066a511..dd36bd125865 100755
---- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-+++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-@@ -963,6 +963,9 @@ typedef struct bkn_priv_s {
- 
-     int speed;
-     int duplex;
-+
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index ffbf77958a94..e78681e4afbf 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -966,6 +966,8 @@ typedef struct bkn_priv_s {
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,6,0))
+     struct ethtool_link_settings link_settings;
+ #endif
 +    /* mark packets as forwarded in hardware */
 +    int offload_fwd_mark;
  } bkn_priv_t;
  
  typedef struct bkn_filter_s {
-@@ -3955,6 +3958,9 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+@@ -4019,6 +4021,9 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
                      }
                      DBG_DUNE(("skb protocol 0x%04x\n", skb->protocol));
  
@@ -45,7 +44,7 @@ index 329f1066a511..dd36bd125865 100755
                      /*
                       * Disable configuration API while the spinlock is released.
                       */
-@@ -4385,6 +4391,9 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+@@ -4466,6 +4471,9 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
                          break;
                      }
  
@@ -55,15 +54,15 @@ index 329f1066a511..dd36bd125865 100755
                      if (mirror_local) {
                          if (mskb) {
                              /* Process mirorr_to netif specific config. */
-@@ -6879,6 +6888,7 @@ bkn_proc_link_show(struct seq_file *m, void *v)
-                         seq_printf(m, ",%d", priv->speed);
-                 if (priv->duplex != DUPLEX_UNKNOWN)
-                         seq_printf(m, ",%s", priv->duplex == DUPLEX_FULL ? "fd" : "hd");
+@@ -7101,6 +7109,7 @@ bkn_proc_link_show(struct seq_file *m, void *v)
+                         seq_printf(m, ",%d", priv->link_settings.speed);
+                 if (priv->link_settings.duplex != DUPLEX_UNKNOWN)
+                         seq_printf(m, ",%s", priv->link_settings.duplex == DUPLEX_FULL ? "fd" : "hd");
 +                seq_printf(m, ",%s", priv->offload_fwd_mark ? "offload" : "no-offload");
                  seq_printf(m, "\n");
  
              }
-@@ -6902,14 +6912,16 @@ bkn_proc_link_open(struct inode * inode, struct file * file)
+@@ -7124,14 +7133,16 @@ bkn_proc_link_open(struct inode * inode, struct file * file)
   *
   *   Where <netif> is a virtual network interface name, and <option> is one of
   *
@@ -83,10 +82,10 @@ index 329f1066a511..dd36bd125865 100755
   */
  static ssize_t
  bkn_proc_link_write(struct file *file, const char *buf,
-@@ -6974,6 +6986,10 @@ bkn_proc_link_write(struct file *file, const char *buf,
+@@ -7196,6 +7207,10 @@ bkn_proc_link_write(struct file *file, const char *buf,
                  } else if (sscanf(ptr, "%d", &speed) == 1 &&
                             ethtool_validate_speed(speed) == 1) {
-                     priv->speed = speed;
+                     priv->link_settings.speed = speed;
 +                } else if (strcmp(ptr, "offload") == 0) {
 +                    priv->offload_fwd_mark = 1;
 +                } else if (strcmp(ptr, "no-offload") == 0) {
@@ -95,5 +94,5 @@ index 329f1066a511..dd36bd125865 100755
                      gprintk("Warning: unknown link state setting: '%s'\n", ptr);
                  }
 -- 
-2.38.1
+2.42.0
 

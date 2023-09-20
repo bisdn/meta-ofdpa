@@ -2,7 +2,7 @@
  * 
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenBCM/master/Legal/LICENSE file.
  * 
- * Copyright 2007-2021 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2022 Broadcom Inc. All rights reserved.
  */
 #ifndef __LINUX_BCM_KNET_H__
 #define __LINUX_BCM_KNET_H__
@@ -48,7 +48,7 @@ typedef int
 (*knet_hw_tstamp_enable_cb_f)(int dev_no, int phys_port, int tx_type);
 
 typedef int
-(*knet_hw_tstamp_tx_time_get_cb_f)(int dev_no, int phys_port, uint8_t *pkt, uint64_t *ts);
+(*knet_hw_tstamp_tx_time_get_cb_f)(int dev_no, int phys_port, uint8_t *pkt, uint64_t *ts, int tx_type);
 
 typedef int
 (*knet_hw_tstamp_tx_meta_get_cb_f)(int dev_no, int hwts, int hdrlen, struct sk_buff *skb, uint64_t *ts, uint32_t **md);

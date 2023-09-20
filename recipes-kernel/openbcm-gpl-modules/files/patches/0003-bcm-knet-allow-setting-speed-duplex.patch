@@ -1,7 +1,7 @@
-From 2d2a622e51f16fd61728f62562974d3fe60b6188 Mon Sep 17 00:00:00 2001
+From 983115e1a8d6ddcf83dec3e48b4a2d92c7928796 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 7 Feb 2022 14:28:11 +0100
-Subject: [PATCH 07/14] bcm-knet: allow setting speed/duplex
+Subject: [PATCH 03/11] bcm-knet: allow setting speed/duplex
 
 To allow better emulation of physical port devices, extend the link
 state settings to also include link speed and duplex.
@@ -11,24 +11,14 @@ entry, allowing multiple arguments as a comma separated list.
 
 Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
 ---
- .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 48 +++++++++++++++----
- 1 file changed, 39 insertions(+), 9 deletions(-)
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 45 +++++++++++++++----
+ 1 file changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index e03de2b76fa3..eecd60db14e8 100755
---- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-+++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-@@ -960,6 +960,9 @@ typedef struct bkn_priv_s {
-     int phys_port;
-     u32 ptp_stats_tx;
-     u32 ptp_stats_rx;
-+
-+    int speed;
-+    int duplex;
- } bkn_priv_t;
- 
- typedef struct bkn_filter_s {
-@@ -6747,6 +6750,7 @@ static struct net_device *
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 16d62862e8a8..83743aefa1e7 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -7007,6 +7007,7 @@ static struct net_device *
  bkn_init_ndev(u8 *mac, char *name)
  {
      struct net_device *dev;
@@ -36,42 +26,42 @@ index e03de2b76fa3..eecd60db14e8 100755
  
      /* Create Ethernet device */
      dev = alloc_etherdev(sizeof(bkn_priv_t));
-@@ -6790,6 +6794,9 @@ bkn_init_ndev(u8 *mac, char *name)
+@@ -7050,6 +7051,9 @@ bkn_init_ndev(u8 *mac, char *name)
      dev->poll_controller = bkn_poll_controller;
  #endif
  #endif
 +    priv = netdev_priv(dev);
-+    priv->speed = SPEED_UNKNOWN;
-+    priv->duplex = DUPLEX_UNKNOWN;
++    priv->link_settings.speed = SPEED_UNKNOWN;
++    priv->link_settings.duplex = DUPLEX_UNKNOWN;
      dev->ethtool_ops = &bkn_ethtool_ops;
      if (name && *name) {
          strncpy(dev->name, name, IFNAMSIZ-1);
-@@ -6828,8 +6835,14 @@ bkn_proc_link_show(struct seq_file *m, void *v)
+@@ -7088,8 +7092,14 @@ bkn_proc_link_show(struct seq_file *m, void *v)
              priv = (bkn_priv_t *)dlist;
              dev = priv->dev;
              if (dev) {
 -                seq_printf(m, "  %-14s %s\n", dev->name,
 +                seq_printf(m, "  %-14s %s", dev->name,
                             netif_carrier_ok(dev) ? "up" : "down");
-+                if (priv->speed != SPEED_UNKNOWN)
-+                        seq_printf(m, ",%d", priv->speed);
-+                if (priv->duplex != DUPLEX_UNKNOWN)
-+                        seq_printf(m, ",%s", priv->duplex == DUPLEX_FULL ? "fd" : "hd");
++                if (priv->link_settings.speed != SPEED_UNKNOWN)
++                        seq_printf(m, ",%d", priv->link_settings.speed);
++                if (priv->link_settings.duplex != DUPLEX_UNKNOWN)
++                        seq_printf(m, ",%s", priv->link_settings.duplex == DUPLEX_FULL ? "fd" : "hd");
 +                seq_printf(m, "\n");
 +
              }
          }
          spin_unlock_irqrestore(&sinfo->lock, flags);
-@@ -6847,13 +6860,18 @@ bkn_proc_link_open(struct inode * inode, struct file * file)
+@@ -7107,13 +7117,18 @@ bkn_proc_link_open(struct inode * inode, struct file * file)
   * Device Link Control Proc Write Entry
   *
   *   Syntax:
 - *   <netif>=up|down
 + *   <netif>=<option>[,<option>]*
++ *
++ *   Where <netif> is a virtual network interface name, and <option> is one of
   *
 - *   Where <netif> is a virtual network interface name.
-+ *   Where <netif> is a virtual network interface name, and <option> is one of
-+ *
 + *   up|down     sets the detected link state
 + *   10|100|...  sets the detected link speed in Mbit/s
 + *   fd|hd       sets the detected link's duplex state (Full|Half)
@@ -83,7 +73,7 @@ index e03de2b76fa3..eecd60db14e8 100755
   */
  static ssize_t
  bkn_proc_link_write(struct file *file, const char *buf,
-@@ -6903,12 +6921,24 @@ bkn_proc_link_write(struct file *file, const char *buf,
+@@ -7163,12 +7178,24 @@ bkn_proc_link_write(struct file *file, const char *buf,
              }
          }
          if (dev) {
@@ -102,12 +92,12 @@ index e03de2b76fa3..eecd60db14e8 100755
 +                } else if (strcmp(ptr, "down") == 0) {
 +                    netif_carrier_off(dev);
 +                } else if (strcmp(ptr, "fd") == 0) {
-+                    priv->duplex = DUPLEX_FULL;
++                    priv->link_settings.duplex = DUPLEX_FULL;
 +                } else if (strcmp(ptr, "hd") == 0) {
-+                    priv->duplex = DUPLEX_HALF;
++                    priv->link_settings.duplex = DUPLEX_HALF;
 +                } else if (sscanf(ptr, "%d", &speed) == 1 &&
 +                           ethtool_validate_speed(speed) == 1) {
-+                    priv->speed = speed;
++                    priv->link_settings.speed = speed;
 +                } else {
 +                    gprintk("Warning: unknown link state setting: '%s'\n", ptr);
 +                }
@@ -115,5 +105,5 @@ index e03de2b76fa3..eecd60db14e8 100755
              spin_unlock_irqrestore(&sinfo->lock, flags);
              return count;
 -- 
-2.38.1
+2.42.0
 

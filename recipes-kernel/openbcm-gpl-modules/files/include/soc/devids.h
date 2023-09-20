@@ -2,7 +2,7 @@
  * 
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenBCM/master/Legal/LICENSE file.
  * 
- * Copyright 2007-2021 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2022 Broadcom Inc. All rights reserved.
  */
 
 #ifndef _SOC_DEVIDS_H
@@ -1455,10 +1455,6 @@
 #define BCM56068_DEVICE_ID      0xb068
 #define BCM56068_A0_REV_ID      1
 #define BCM56068_B0_REV_ID      0x11
-
-#define BCM56068_DEVICE_ID      0xb068
-#define BCM56068_A0_REV_ID      1
-#define BCM56068_B0_REV_ID      0x11
 #define BCM56068_B1_REV_ID      0x12
 
 #define BCM56069_DEVICE_ID      0xb069
@@ -1608,6 +1604,10 @@
 #define BCM53549_DEVICE_ID      0x8549
 #define BCM53549_A0_REV_ID      1
 
+/* Wolfhound3 */
+#define BCM53642_DEVICE_ID      0x8642
+#define BCM53642_A0_REV_ID      1
+
 /*
  * BCM5665: Tucana48 (48+4+1)
  * BCM5665L: Tucana24 (24+4+1)
@@ -1649,8 +1649,6 @@
 #define BROADCOM_PHYID_HIGH 0x0040
 
 /* Define Dune device IDs */
-#define GEDI_DEVICE_ID          0xa100 /* 0xfa100 really */
-#define GEDI_REV_ID             0x0001 
 #define ARAD_DEVICE_ID          0x8650 
 #define ARAD_A0_REV_ID          0x0000
 #define ARAD_B0_REV_ID          0x0011  
@@ -1680,6 +1678,7 @@
 #define BCM88956_A1_REV_ID      0x0002
 #define DNXC_A0_REV_ID          0x0001
 #define DNXC_A1_REV_ID          0x0002
+#define DNXC_A2_REV_ID          0x0003
 #define DNXC_B0_REV_ID          0x0011
 #define DNXC_B1_REV_ID          0x0012
 #define DNXC_DEVID_FAMILY_MASK  0xfff0
@@ -1910,9 +1909,11 @@
 #define J2P_DEVICE_ID                 0x8850
 #define J2P_A0_REV_ID           DNXC_A0_REV_ID
 #define J2P_A1_REV_ID           DNXC_A1_REV_ID
+#define J2P_A2_REV_ID           DNXC_A2_REV_ID
 #define BCM88850_DEVICE_ID      J2P_DEVICE_ID
 #define BCM88850_A0_REV_ID      J2P_A0_REV_ID
 #define BCM88850_A1_REV_ID      J2P_A1_REV_ID
+#define BCM88850_A2_REV_ID      J2P_A2_REV_ID
 #define BCM88851_DEVICE_ID      0x8851
 #define BCM88852_DEVICE_ID      0x8852
 #define BCM88853_DEVICE_ID      0x8853
@@ -1946,6 +1947,10 @@
 #define BCM8884E_DEVICE_ID      0x884E
 #define BCM8884F_DEVICE_ID      0x884F
 
+#define J2X_DEVICE_ID                 0x8830
+#define J2X_A0_REV_ID           DNXC_A0_REV_ID
+#define BCM88830_DEVICE_ID      J2X_DEVICE_ID
+#define BCM88830_A0_REV_ID      J2X_A0_REV_ID
 #define BCM88831_DEVICE_ID      0x8831
 #define BCM88832_DEVICE_ID      0x8832
 #define BCM88833_DEVICE_ID      0x8833
@@ -2100,14 +2105,99 @@
 #define BCM88952_A0_REV_ID		0x0001
 #define BCM88952_A1_REV_ID		0x0002
 
-#define PCP_PCI_VENDOR_ID 0x1172
-#define PCP_PCI_DEVICE_ID 0x4
-
-#define ACP_PCI_VENDOR_ID 0x10ee
-#define ACP_PCI_DEVICE_ID 0x7011
-#define ACP_PCI_REV_ID    0x0001
-
 #define PLX9056_DEVICE_ID       0x9056 /* needed for DNX_TEST_BOARD */
 
-#endif  /* !_SOC_DEVIDS_H */
+/* Trident4 X11c*/
+#define BCM56890_DEVICE_ID 0xb890
+#define BCM56890_A0_REV_ID 0x0001
 
+/* Trident4 */
+#define BCM56880_DEVICE_ID 0xb880
+#define BCM56880_A0_REV_ID 0x0001
+#define BCM56880_B0_REV_ID 0x0011
+#define BCM56881_DEVICE_ID 0xb881
+#define BCM56881_A0_REV_ID 0x0001
+#define BCM56881_B0_REV_ID 0x0011
+#define BCM56883_DEVICE_ID 0xb883
+#define BCM56883_A0_REV_ID 0x0001
+#define BCM56883_B0_REV_ID 0x0011
+
+/* Trident4 X9 */
+#define BCM56780_DEVICE_ID 0xb780
+#define BCM56780_A0_REV_ID 0x0001
+#define BCM56782_DEVICE_ID 0xb782
+#define BCM56782_A0_REV_ID 0x0001
+#define BCM56784_DEVICE_ID 0xb784
+#define BCM56784_A0_REV_ID 0x0001
+#define BCM56785_DEVICE_ID 0xb785
+#define BCM56785_A0_REV_ID 0x0001
+#define BCM56786_DEVICE_ID 0xb786
+#define BCM56786_A0_REV_ID 0x0001
+#define BCM56787_DEVICE_ID 0xb787
+#define BCM56787_A0_REV_ID 0x0001
+#define BCM56788_DEVICE_ID 0xb788
+#define BCM56788_A0_REV_ID 0x0001
+#define BCM56789_DEVICE_ID 0xb789
+#define BCM56789_A0_REV_ID 0x0001
+
+/* Tomahawk4 */
+#define BCM56990_DEVICE_ID 0xb990
+#define BCM56990_A0_REV_ID 0x0001
+
+/* Tomahawk4 */
+#ifndef BCM56990_DEVICE_ID
+#define BCM56990_DEVICE_ID 0xb990
+#define BCM56990_A0_REV_ID 0x0001
+#endif
+#define BCM56990_B0_REV_ID 0x0011
+#define BCM56991_DEVICE_ID 0xb991
+#define BCM56991_B0_REV_ID 0x0011
+#define BCM56992_DEVICE_ID 0xb992
+#define BCM56992_B0_REV_ID 0x0011
+#define BCM56993_DEVICE_ID 0xb993
+#define BCM56993_B0_REV_ID 0x0011
+
+/* Tomahawk4G */
+#define BCM56996_DEVICE_ID 0xb996
+#define BCM56996_A0_REV_ID 0x0001
+#define BCM56997_DEVICE_ID 0xb997
+#define BCM56997_A0_REV_ID 0x0001
+
+/* Tomahawk4G */
+#ifndef BCM56996_DEVICE_ID
+#define BCM56996_DEVICE_ID 0xb996
+#define BCM56996_A0_REV_ID 0x0001
+#define BCM56997_DEVICE_ID 0xb997
+#endif
+#define BCM56996_B0_REV_ID 0x0011
+#define BCM56997_B0_REV_ID 0x0011
+
+/* Tomahawk4GT */
+#define BCM56998_DEVICE_ID 0xb998
+#define BCM56998_A0_REV_ID 0x0001
+
+/* Tomahawk4D */
+#define BCM56999_DEVICE_ID 0xb999
+#define BCM56999_A0_REV_ID 0x0001
+#define BCM56999_B0_REV_ID 0x0011
+#define BCM56995_DEVICE_ID 0xb995
+#define BCM56995_A0_REV_ID 0x0001
+#define BCM56995_B0_REV_ID 0x0011
+
+/* Tomahawk5 */
+#define BCM78900_DEVICE_ID 0xf900
+#define BCM78900_B0_REV_ID 0x0011
+
+/* Pex1 */
+#define BCM56080_DEVICE_ID 0xb080
+#define BCM56080_A0_REV_ID 0x0001
+#define BCM56081_DEVICE_ID 0xb081
+#define BCM56081_A0_REV_ID 0x0001
+#define BCM56082_DEVICE_ID 0xb082
+#define BCM56082_A0_REV_ID 0x0001
+#define BCM56083_DEVICE_ID 0xb083
+#define BCM56083_A0_REV_ID 0x0001
+#define BCM56084_DEVICE_ID 0xb084
+#define BCM56084_A0_REV_ID 0x0001
+
+#endif  /* !_SOC_DEVIDS_H */
