@@ -4,7 +4,7 @@ LICENSE = "CLOSED"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PR = "r28.1"
+PR = "r28.2"
 SDK_VERSION = "6.5.24"
 SRCREV_ofdpa = "8d10ff02e0445267b458ea19191af5a5a63ce3d6"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
@@ -39,6 +39,7 @@ PACKAGES =+ "\
 FILES:${PN} += "\
             ${sbindir}/ofdpa \
             ${sysconfdir}/default/ofdpa \
+            ${sysconfdir}/default/ofdpa_log.cfg \
             ${sysconfdir}/ofdpa \
             ${systemd_unitdir}/system/ofdpa.service \
             ${sbindir}/client* \
@@ -69,6 +70,7 @@ FILES:${PN}-firmware-bcm56870 = " \
 
 CONFFILES:${PN} = " \
   ${sysconfdir}/default/ofdpa \
+  ${sysconfdir}/default/ofdpa_log.cfg \
   ${sysconfdir}/ofdpa/rc.soc \
 "
 
