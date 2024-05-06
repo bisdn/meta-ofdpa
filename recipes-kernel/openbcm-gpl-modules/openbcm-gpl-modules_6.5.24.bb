@@ -26,6 +26,7 @@ SRC_URI = " \
           file://patches/0012-bcm-knet-replace-open-coded-mac-change-code-with-eth.patch;striplevel=2 \
           file://patches/0013-bcm-knet-update-API-for-kernel-5.19.patch;striplevel=2 \
           file://patches/0014-linux-kernel-bde-use-platform_get_irq.patch;striplevel=2 \
+          file://patches/0015-bcm-knet-extract-and-update-DSCP-for-IP-packets.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \
