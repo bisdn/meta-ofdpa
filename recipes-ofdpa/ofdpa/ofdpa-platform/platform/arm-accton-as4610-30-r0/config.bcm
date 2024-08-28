@@ -83,16 +83,28 @@ dport_map_enable=1
 
 dport_map_port_1=2
 dport_map_port_2=1
+dport_map_port_3=3
+dport_map_port_4=4
 dport_map_port_5=6
 dport_map_port_6=5
+dport_map_port_7=7
+dport_map_port_8=8
 dport_map_port_9=10
 dport_map_port_10=9
+dport_map_port_11=11
+dport_map_port_12=12
 dport_map_port_13=14
 dport_map_port_14=13
+dport_map_port_15=15
+dport_map_port_16=16
 dport_map_port_17=18
 dport_map_port_18=17
+dport_map_port_19=19
+dport_map_port_20=20
 dport_map_port_21=22
 dport_map_port_22=21
+dport_map_port_23=23
+dport_map_port_24=24
 
 # 10G ports
 phy_ext_rom_boot=0
