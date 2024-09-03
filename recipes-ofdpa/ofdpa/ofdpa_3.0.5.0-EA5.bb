@@ -1,9 +1,9 @@
 DESCRIPTION = ""
 LICENSE = "CLOSED"
 
-PR = "r36"
+PR = "r37"
 SDK_VERSION = "6.5.24"
-SRCREV_ofdpa = "f6b060788844aa0cefed4cbe700bb66202da6402"
+SRCREV_ofdpa = "a806ccb083e7d06a550e7e3abb8f2b8862ccb2fe"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 
 inherit systemd python3-dir
