@@ -4,9 +4,9 @@ LICENSE = "CLOSED"
 # this is machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-PR = "r28.9"
+PR = "r28.10"
 SDK_VERSION = "6.5.24"
-SRCREV_ofdpa = "055252b0378c2d3c56e06ba21ea0adc9341a3324"
+SRCREV_ofdpa = "55b00d96f9891ec7ebbf510e6bc3bdb932bc242a"
 SRCREV_sdk = "0b149ddfa3878e65eb217a11dddb999d3e205d03"
 
 inherit systemd python3-dir
