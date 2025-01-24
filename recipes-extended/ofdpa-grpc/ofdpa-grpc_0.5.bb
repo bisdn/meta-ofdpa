@@ -4,9 +4,9 @@ inherit systemd
 
 include ofdpa-grpc.inc
 
-SRCREV = "d293d675f2cd6a4b83403bd9ce6c33c9e228fceb"
+SRCREV = "58ce2e6cacca758b5fc55c66447982e982098ceb"
 
-DEPENDS += "grpc gflags glog protobuf openssl ofdpa"
+DEPENDS += "grpc gflags glog protobuf openssl ofdpa systemd"
 
 SYSTEMD_SERVICE:${PN}:append = "ofdpa-grpc.service"
 
