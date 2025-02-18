@@ -23,6 +23,8 @@ SRC_URI = " \
           file://patches/0009-bcm-knet-update-API-for-kernel-5.19.patch;striplevel=2 \
           file://patches/0010-linux-kernel-bde-use-platform_get_irq.patch;striplevel=2 \
           file://patches/0011-bcm-knet-extract-and-update-DSCP-for-IP-packets.patch;striplevel=2 \
+          file://patches/0012-bcm-knet-update-API-for-kernel-6.11.patch;striplevel=2 \
+          file://patches/0013-bde-handle-renamed-MAX_ORDER-in-linux-6.8.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \

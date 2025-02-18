@@ -1,0 +1,74 @@
+From 102dfb91165c53ac9c2836f3567c0ce752ac3b85 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Tue, 18 Feb 2025 16:21:12 +0100
+Subject: [PATCH 2/2] bcm-knet: update API for kernel 6.11
+
+Update kernel API usage for kernel 6.11:
+
+* strscpy() was dropped, with strlcpy() being mostly a drop-in
+  replacement
+* platform_driver::remove() now returns void instead of int
+* ethtool_ts_info was renamed to kernel_ethtool_ts_info
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.27/systems/bde/linux/kernel/linux-kernel-bde.c |  6 ++++++
+ .../systems/linux/kernel/modules/bcm-knet/bcm-knet.c   | 10 +++++++---
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/sdk-6.5.27/systems/bde/linux/kernel/linux-kernel-bde.c b/sdk-6.5.27/systems/bde/linux/kernel/linux-kernel-bde.c
+index d4358a3a6720..e274962203d5 100644
+--- a/sdk-6.5.27/systems/bde/linux/kernel/linux-kernel-bde.c
++++ b/sdk-6.5.27/systems/bde/linux/kernel/linux-kernel-bde.c
+@@ -832,7 +832,11 @@ iproc_cmicd_probe(struct platform_device *pldev)
+     return 0;
+ }
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,11,0))
+ static int
++#else
++static void
++#endif
+ iproc_cmicd_remove(struct platform_device *pldev)
+ {
+     int i;
+@@ -854,7 +858,9 @@ iproc_cmicd_remove(struct platform_device *pldev)
+         }
+     }
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,11,0))
+     return 0;
++#endif
+ }
+ #ifdef CONFIG_OF
+ static const struct of_device_id iproc_cmicd_of_match[] = {
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 04c7d52c8b07..0061c5b3e810 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -6962,15 +6962,19 @@ bkn_get_drvinfo(struct net_device *dev, struct ethtool_drvinfo *drvinfo)
+         return;
+     }
+ 
+-    strlcpy(drvinfo->driver, "bcm-knet", sizeof(drvinfo->driver));
++    strscpy(drvinfo->driver, "bcm-knet", sizeof(drvinfo->driver));
+     snprintf(drvinfo->version, sizeof(drvinfo->version), "%d", KCOM_VERSION);
+-    strlcpy(drvinfo->fw_version, "N/A", sizeof(drvinfo->fw_version));
+-    strlcpy(drvinfo->bus_info, "N/A", sizeof(drvinfo->bus_info));
++    strscpy(drvinfo->fw_version, "N/A", sizeof(drvinfo->fw_version));
++    strscpy(drvinfo->bus_info, "N/A", sizeof(drvinfo->bus_info));
+ }
+ 
+ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,5,0))
+ static int
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6,11,0))
+ bkn_get_ts_info(struct net_device *dev, struct ethtool_ts_info *info)
++#else
++bkn_get_ts_info(struct net_device *dev, struct kernel_ethtool_ts_info *info)
++#endif
+ {
+     bkn_priv_t *priv;
+     bkn_switch_info_t *sinfo;
+-- 
+2.48.1
+
