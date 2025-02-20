@@ -1,0 +1,32 @@
+From eb935b963e2ccb5de153a86b461448bfc0282a84 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Tue, 18 Feb 2025 21:42:31 +0100
+Subject: [PATCH] bde: handle renamed MAX_ORDER in linux 6.8+
+
+MAX_ORDER was redefined and renamed as MAX_PAGE_ORDER in 6.8
+
+23baf831a32c04f9a968812511540b1b3e648bf5
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.27/systems/bde/linux/kernel/linux_dma.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/sdk-6.5.27/systems/bde/linux/kernel/linux_dma.c b/sdk-6.5.27/systems/bde/linux/kernel/linux_dma.c
+index 1b0e4159bb86..e17e4d3c7663 100644
+--- a/sdk-6.5.27/systems/bde/linux/kernel/linux_dma.c
++++ b/sdk-6.5.27/systems/bde/linux/kernel/linux_dma.c
+@@ -65,6 +65,10 @@
+ #define ALLOC_TYPE_API 1 /* use one allocation */
+ #define ALLOC_TYPE_HIMEM 2 /* use high memory */
+ 
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6,8,0))
++#define MAX_ORDER (MAX_PAGE_ORDER + 1)
++#endif
++
+ #if _SIMPLE_MEMORY_ALLOCATION_
+ #include <linux/dma-mapping.h>
+ #if defined(CONFIG_CMA) && defined(CONFIG_CMA_SIZE_MBYTES)
+-- 
+2.48.1
+
