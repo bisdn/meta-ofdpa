@@ -12,21 +12,17 @@ SRC_URI = " \
           file://Makefile;subdir=src \
           file://bisdn-bcm-dev.sh \
           file://bisdn-bcm-dev.rules \
-          file://patches/0001-gmodule-update-proc-code-for-linux-5.6.patch;striplevel=2 \
-          file://patches/0002-kernel-modules-add-dropped-defines-to-work-with-5.9.patch;striplevel=2 \
-          file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch;striplevel=2 \
-          file://patches/0004-bcm-knet-update-API-for-linux-5.6.0.patch;striplevel=2 \
-          file://patches/0005-bcm-knet-strip-vlan-tag-if-received-untagged-at-port.patch;striplevel=2 \
-          file://patches/0006-bcm-knet-report-link-state.patch;striplevel=2 \
-          file://patches/0007-bcm-knet-allow-setting-speed-duplex.patch;striplevel=2 \
-          file://patches/0008-bcm-knet-implement-get_link_ksettings.patch;striplevel=2 \
-          file://patches/0009-bcm-knet-fix-race-between-creation-and-open.patch;striplevel=2 \
-          file://patches/0010-bcm-knet-use-fully-randomized-mac-addresses.patch;striplevel=2 \
-          file://patches/0011-bcm-knet-allow-marking-packets-as-offloaded.patch;striplevel=2 \
-          file://patches/0012-bcm-knet-replace-open-coded-mac-change-code-with-eth.patch;striplevel=2 \
-          file://patches/0013-bcm-knet-update-API-for-kernel-5.19.patch;striplevel=2 \
-          file://patches/0014-linux-kernel-bde-use-platform_get_irq.patch;striplevel=2 \
-          file://patches/0015-bcm-knet-extract-and-update-DSCP-for-IP-packets.patch;striplevel=2 \
+          file://patches/0001-bcm-knet-strip-vlan-tag-if-received-untagged-at-port.patch;striplevel=2 \
+          file://patches/0002-bcm-knet-report-link-state.patch;striplevel=2 \
+          file://patches/0003-bcm-knet-allow-setting-speed-duplex.patch;striplevel=2 \
+          file://patches/0004-bcm-knet-only-report-speed-duplex-on-link.patch;striplevel=2 \
+          file://patches/0005-bcm-knet-fix-race-between-creation-and-open.patch;striplevel=2 \
+          file://patches/0006-bcm-knet-use-fully-randomized-mac-addresses.patch;striplevel=2 \
+          file://patches/0007-bcm-knet-allow-marking-packets-as-offloaded.patch;striplevel=2 \
+          file://patches/0008-bcm-knet-replace-open-coded-mac-change-code-with-eth.patch;striplevel=2 \
+          file://patches/0009-bcm-knet-update-API-for-kernel-5.19.patch;striplevel=2 \
+          file://patches/0010-linux-kernel-bde-use-platform_get_irq.patch;striplevel=2 \
+          file://patches/0011-bcm-knet-extract-and-update-DSCP-for-IP-packets.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \

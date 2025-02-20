@@ -1,7 +1,7 @@
-From a8917b2bcbbdbe6f137308e8f3297509bdf82f71 Mon Sep 17 00:00:00 2001
+From 3f0ecba854d17a19f7026cc2a4133b4fdab10a7f Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 18 Nov 2022 16:24:41 +0100
-Subject: [PATCH 12/14] bcm-knet: replace open coded mac change code with
+Subject: [PATCH 08/11] bcm-knet: replace open coded mac change code with
  eth_mac_addr
 
 Linux 5.17 made netdev->dev_addr[] constant, so we cannot modify it
@@ -15,11 +15,11 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 19 ++-----------------
  1 file changed, 2 insertions(+), 17 deletions(-)
 
-diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index dd36bd125865..3abacd4a1f1e 100755
---- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-+++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-@@ -5513,22 +5513,6 @@ bkn_open(struct net_device *dev)
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index e78681e4afbf..d6068df18314 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -5717,22 +5717,6 @@ bkn_open(struct net_device *dev)
      return 0;
  }
  
@@ -42,7 +42,7 @@ index dd36bd125865..3abacd4a1f1e 100755
  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29))
  static int
  bkn_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
-@@ -6661,7 +6645,7 @@ static const struct net_device_ops bkn_netdev_ops = {
+@@ -6871,7 +6855,7 @@ static const struct net_device_ops bkn_netdev_ops = {
      .ndo_get_stats       = bkn_get_stats,
      .ndo_validate_addr   = eth_validate_addr,
      .ndo_set_rx_mode     = bkn_set_multicast_list,
@@ -51,7 +51,7 @@ index dd36bd125865..3abacd4a1f1e 100755
      .ndo_do_ioctl        = bkn_ioctl,
      .ndo_tx_timeout      = NULL,
      .ndo_change_mtu      = bkn_change_mtu,
-@@ -6835,6 +6819,7 @@ bkn_init_ndev(u8 *mac, char *name)
+@@ -7056,6 +7040,7 @@ bkn_init_ndev(u8 *mac, char *name)
      /* Device vectors */
  #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,29))
      dev->netdev_ops = &bkn_netdev_ops;
@@ -60,5 +60,5 @@ index dd36bd125865..3abacd4a1f1e 100755
      dev->open = bkn_open;
      dev->hard_start_xmit = bkn_tx;
 -- 
-2.38.1
+2.42.0
 

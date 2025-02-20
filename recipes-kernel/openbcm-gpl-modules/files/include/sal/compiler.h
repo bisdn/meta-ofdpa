@@ -2,7 +2,7 @@
  * 
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenBCM/master/Legal/LICENSE file.
  * 
- * Copyright 2007-2021 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2022 Broadcom Inc. All rights reserved.
  *
  * Compiler Specific defines and options
  */
@@ -36,6 +36,7 @@
 
 /*
  * Return a string containing the current FILE:LINE location in the code. 
+ *
  */
 #define __STRINGIFY(x) #x
 #define _STRINGIFY(x) __STRINGIFY(x)
@@ -276,12 +277,14 @@ static int u64_LSW = 0;
 #define COMPILER_INT64                      long
 #define u64_H(v)                            (((uint32 *) &(v))[u64_MSW])
 #define u64_L(v)                            (((uint32 *) &(v))[u64_LSW])
-#define COMPILER_64_INIT(_hi, _lo)          ( (((long) (_hi)) << 32) | (_lo))
+#define COMPILER_64_INIT(_hi, _lo)          ( (((unsigned long) (_hi)) << 32) | (_lo))
 #define COMPILER_64_PRINTF_FORMAT           "%lu"
 #define COMPILER_64_PRINTF_SIZE_FORMAT      "l"
 /* literal uint64 literal required by some compilers */
 #define COMPILER_64_LITERAL(value)          value##UL
 #define COMPILER_64_PRINTF_VALUE(value_64)  value_64
+/* Define 64-bit unsigned integer and initialize to zero */
+#define COMPILER_64_DEFINE_INIT(val64)         COMPILER_UINT64 val64 = 0
 /* } */
 #else /* !LONGS_ARE_64BITS */
 /* { */
@@ -294,13 +297,14 @@ static int u64_LSW = 0;
 #define COMPILER_INT64                      long long
 #define u64_H(v)                            (((uint32 *) &(v))[u64_MSW])
 #define u64_L(v)                            (((uint32 *) &(v))[u64_LSW])
-#define COMPILER_64_INIT(_hi, _lo)          ( (((long long) (_hi)) << 32) | (_lo))
+#define COMPILER_64_INIT(_hi, _lo)          ( (((unsigned long long) (_hi)) << 32) | (_lo))
 #define COMPILER_64_PRINTF_FORMAT           "%llu"
 #define COMPILER_64_PRINTF_SIZE_FORMAT      "ll"
 /* literal uint64 literal required by some compilers */
 #define COMPILER_64_LITERAL(value)          value##ULL
 #define COMPILER_64_PRINTF_VALUE(value_64)  value_64
-
+/* Define 64-bit unsigned integer and initialize to zero */
+#define COMPILER_64_DEFINE_INIT(val64)         COMPILER_UINT64 val64 = 0
 /* } */
 #else /* !COMPILER_HAS_LONGLONG */
 /* { */
@@ -313,6 +317,10 @@ typedef struct sal_int64_s  { int u64_w[2]; } sal_int64_t;
 #define u64_L(v)                            ((v).u64_w[u64_LSW])
 #define COMPILER_64_PRINTF_FORMAT           "(%u,%u)"
 #define COMPILER_64_PRINTF_VALUE(value_64)  COMPILER_64_HI(value_64),COMPILER_64_LO(value_64)
+/* Define 64-bit unsigned integer and initialize to zero */
+/* Fixes gcc compilation warnings for 64-bit var init */
+static const COMPILER_UINT64 val64_zero;
+#define COMPILER_64_DEFINE_INIT(val64)      COMPILER_UINT64 val64 = val64_zero
 
 #ifdef BE_HOST
 /* { */
@@ -323,7 +331,6 @@ typedef struct sal_int64_s  { int u64_w[2]; } sal_int64_t;
 #define COMPILER_64_INIT(_hi, _lo)         { { _lo, _hi } }
 /* } */
 #endif
-
 /* } */
 #endif /* !COMPILER_HAS_LONGLONG */
 /* } */
@@ -342,7 +349,6 @@ typedef struct sal_int64_s  { int u64_w[2]; } sal_int64_t;
 #define COMPILER_64_LO(src)     ((uint32) (src))
 #define COMPILER_64_ZERO(dst)       ((dst) = 0)
 #define COMPILER_64_IS_ZERO(src)    ((src) == 0)
-                                       
 
 #define COMPILER_64_SET(dst, src_hi, src_lo)                \
     ((dst) = (((uint64) ((uint32)(src_hi))) << 32) | ((uint64) ((uint32)(src_lo))))
@@ -816,6 +822,7 @@ typedef struct sal_int64_s  { int u64_w[2]; } sal_int64_t;
  * if you would prefer double precision, but it is not necessary.
  * If you need more control (or you need to print :), then
  * then you should use the COMPILER_HAS_DOUBLE macro explicitly.
+ *
  */
 #ifdef COMPILER_HAS_DOUBLE
 /* { */

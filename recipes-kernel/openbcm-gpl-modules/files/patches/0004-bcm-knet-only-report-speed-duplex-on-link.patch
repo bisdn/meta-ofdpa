@@ -1,0 +1,33 @@
+From f2fbbbd8096c3138f82e95bc1ac26cc20a4e664c Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 11 Sep 2023 16:12:36 +0200
+Subject: [PATCH 04/11] bcm-knet: only report speed/duplex on link
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../systems/linux/kernel/modules/bcm-knet/bcm-knet.c     | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 83743aefa1e7..0ecca6651e5f 100755
+--- a/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.27/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -6972,8 +6972,13 @@ bkn_get_link_ksettings(struct net_device *netdev,
+ {
+     bkn_priv_t *priv = netdev_priv(netdev);
+ 
+-    cmd->base.speed = priv->link_settings.speed;
+-    cmd->base.duplex = priv->link_settings.duplex;
++    if (netif_carrier_ok(netdev)) {
++        cmd->base.speed = priv->link_settings.speed;
++        cmd->base.duplex = priv->link_settings.duplex;
++    } else {
++        cmd->base.speed = SPEED_UNKNOWN;
++        cmd->base.duplex = DUPLEX_UNKNOWN;
++    }
+ 
+     return 0;
+ }
+-- 
+2.42.0
+

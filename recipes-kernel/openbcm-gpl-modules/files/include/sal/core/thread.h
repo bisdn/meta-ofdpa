@@ -2,7 +2,7 @@
  * 
  * This license is set out in https://raw.githubusercontent.com/Broadcom-Network-Switching-Software/OpenBCM/master/Legal/LICENSE file.
  * 
- * Copyright 2007-2021 Broadcom Inc. All rights reserved.
+ * Copyright 2007-2022 Broadcom Inc. All rights reserved.
  *
  * File: 	thread.h
  * Purpose: 	SAL thread definitions
@@ -123,7 +123,6 @@ extern int sal_thread_prio_get(int *prio) SAL_ATTR_WEAK;
 
 typedef int (*thread_traverse_cb_f)(void *, int, char *);
 extern void sal_thread_traverse(thread_traverse_cb_f cb_func, void *cb_date) SAL_ATTR_WEAK;
-
 
 
 #define sal_msleep(x)    sal_usleep((x) * 1000)

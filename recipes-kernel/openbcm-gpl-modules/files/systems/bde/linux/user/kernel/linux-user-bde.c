@@ -136,8 +136,6 @@ MODULE_LICENSE("GPL");
 #define HX5_INTC_INTR_STATUS_BASE          (HX5_INTC_INTR_STATUS_REG0)
 #define HX5_INTC_INTR_RAW_STATUS_BASE      (HX5_INTC_INTR_RAW_STATUS_REG0)
 
-#define IOREMAP(addr, size)                ioremap_nocache(addr, size)
-
 #define HX5_IHOST_GICD_ISENABLERN_0        (0x10781100)
 #define HX5_IHOST_GICD_ISENABLERN_1        (0x10781104)
 #define HX5_IHOST_GICD_ICENABLERN_1        (0x10781184)
@@ -181,6 +179,7 @@ MODULE_LICENSE("GPL");
 
 /* Defines used to distinguish CMICe from CMICm */
 #define CMICE_DEV_REV_ID                (0x178 / sizeof(uint32))
+
 
 static uint32 *ihost_intr_status_base = NULL;
 static uint32 *ihost_intr_enable_base = NULL;
@@ -567,6 +566,34 @@ _cmicx_interrupt_prepare(bde_ctrl_t *ctrl)
     }
 
     return ret;
+}
+
+static int
+_cmicx_interrupt_pending(void *data)
+{
+    int d, ind;
+    uint32 stat, iena;
+    bde_ctrl_t *ctrl = (bde_ctrl_t *)data;
+
+    if (ctrl->dev_type & BDE_PCI_DEV_TYPE) {
+
+        d = (((uint8 *)ctrl - (uint8 *)_devices) / sizeof (bde_ctrl_t));
+
+        for (ind = 0; ind < ctrl->intr_regs.intc_intr_nof_regs; ind++) {
+            IPROC_READ(d, ctrl->intr_regs.intc_intr_status_base + 4 * ind, stat);
+            IPROC_READ(d, ctrl->intr_regs.intc_intr_enable_base + 4 * ind, iena);
+            if (debug >= 2) {
+                gprintk("INTC_INTR_STATUS_REG_%d = 0x%x\n", ind, stat);
+                gprintk("INTC_INTR_ENABLE_REG_%d = 0x%x\n", ind, iena);
+            }
+            if (stat & iena) {
+                return 1;
+            }
+        }
+    }
+
+    /* No pending interrupts */
+    return 0;
 }
 
 static void
@@ -1184,14 +1211,15 @@ _devices_init(int d)
         case BCM56575_DEVICE_ID:
         case BCM56175_DEVICE_ID:
         case BCM56176_DEVICE_ID:
+        case BCM53642_DEVICE_ID:
             ctrl->isr = (isr_f)_cmicx_interrupt;
             if (ctrl->dev_type & BDE_AXI_DEV_TYPE) {
                 if (!ihost_intr_enable_base) {
-                    ihost_intr_enable_base = (uint32_t *)IOREMAP(HX5_IHOST_GICD_ISENABLERN_1,
+                    ihost_intr_enable_base = (uint32_t *)ioremap(HX5_IHOST_GICD_ISENABLERN_1,
                                                                  HX5_IHOST_INTR_MAP_NUM);
                 }
                 if (!ihost_intr_status_base) {
-                    ihost_intr_status_base = (uint32_t *)IOREMAP(HX5_INTC_INTR_RAW_STATUS_REG0,
+                    ihost_intr_status_base = (uint32_t *)ioremap(HX5_INTC_INTR_RAW_STATUS_REG0,
                                                                  HX5_IHOST_INTR_STATUS_MAP_NUM);
                 }
             }
@@ -1237,6 +1265,7 @@ _devices_init(int d)
           case Q2U_DEVICE_ID:
           case Q2N_DEVICE_ID:
           case J2P_DEVICE_ID:
+          case J2X_DEVICE_ID:
 #endif
 #ifdef BCM_DNXF_SUPPORT
           case  BCM88790_DEVICE_ID:
@@ -1757,6 +1786,14 @@ _ioctl(unsigned int cmd, unsigned long arg)
         }
         if (_devices[io.dev].dev_type & BDE_SWITCH_DEV_TYPE) {
             if (_devices[io.dev].isr && !_devices[io.dev].enabled) {
+                /* PCI/CMICX Devices */
+                if ((_devices[io.dev].dev_type & BDE_PCI_DEV_TYPE) &&
+                    (_devices[io.dev].isr == (isr_f)_cmicx_interrupt)) {
+                    lkbde_intr_cb_register(io.dev,
+                                           _cmicx_interrupt_pending,
+                                           _devices+io.dev);
+                }
+
                 user_bde->interrupt_connect(io.dev,
                                             _devices[io.dev].isr,
                                             _devices+io.dev);
@@ -1981,7 +2018,7 @@ _ioctl(unsigned int cmd, unsigned long arg)
             return -EINVAL;
         }
         if (_devices[io.dev].dev_type & BDE_AXI_DEV_TYPE) {
-            mapaddr = IOREMAP(io.d0, sizeof(uint32_t));
+            mapaddr = ioremap(io.d0, sizeof(uint32_t));
             if (mapaddr == NULL) {
                 io.rc = LUBDE_FAIL;
                 return -1;
