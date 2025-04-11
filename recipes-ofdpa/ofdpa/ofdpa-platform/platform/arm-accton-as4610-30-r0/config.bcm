@@ -1,5 +1,6 @@
 l2_mem_entries=
 l3_mem_entries=
+mmu_lossless=0
 pbmp_xport_ge=0x0000001fffffe
 pbmp_xport_xe=0x47c0000000000
 pbmp_valid=0x47c0001ffffff
