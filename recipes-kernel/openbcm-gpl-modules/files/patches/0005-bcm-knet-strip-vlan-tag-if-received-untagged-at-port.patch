@@ -1,7 +1,7 @@
-From 8e16ebdaa76e8799623cd2b6af2a3578261f689a Mon Sep 17 00:00:00 2001
+From bf2dda4bfe2a12d121e97f4875f15ef34b6d8ec0 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 4 Feb 2022 12:34:02 +0100
-Subject: [PATCH 05/14] bcm-knet: strip vlan tag if received untagged at port
+Subject: [PATCH 05/19] bcm-knet: strip vlan tag if received untagged at port
 
 The CPU port will always add a vlan tag, but we can check the header for
 the state at reception. If it was received untagged, strip the vlan tag
@@ -202,5 +202,5 @@ index b701c38c2027..10d08f798ab0 100755
                          rx_cb_meta = sand_scratch_data;
                      } else {
 -- 
-2.38.1
+2.49.0
 

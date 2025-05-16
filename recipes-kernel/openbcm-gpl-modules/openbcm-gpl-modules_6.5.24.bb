@@ -27,6 +27,10 @@ SRC_URI = " \
           file://patches/0013-bcm-knet-update-API-for-kernel-5.19.patch;striplevel=2 \
           file://patches/0014-linux-kernel-bde-use-platform_get_irq.patch;striplevel=2 \
           file://patches/0015-bcm-knet-extract-and-update-DSCP-for-IP-packets.patch;striplevel=2 \
+          file://patches/0016-bcm-knet-fix-reported-tx-bytes.patch;striplevel=2 \
+          file://patches/0017-bcm-knet-switch-to-stat64.patch;striplevel=2 \
+          file://patches/0018-kcom-add-a-message-for-pushing-hw-counters-to-netifs.patch;striplevel=2 \
+          file://patches/0019-bcm-knet-expose-hw-counters-on-port-netifs.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \

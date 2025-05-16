@@ -1,0 +1,395 @@
+From e955bc42216610a7f6b172c8b6036d286d180a3f Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Wed, 14 May 2025 10:48:41 +0200
+Subject: [PATCH 17/19] bcm-knet: switch to stat64
+
+In preparation to report accurate counts, switch to stat64. This has no
+effect on 64 bit, but for 32 bit this switches to 64 bit counters. Since
+64 bit values cannot be written atomically, make use of u64_stat_sync
+helpers.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 140 +++++++++++++-----
+ 1 file changed, 106 insertions(+), 34 deletions(-)
+
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 0dac8ec479d9..0c2b6c5fa65b 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -67,6 +67,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/if_vlan.h>
+ #include <linux/nsproxy.h>
++#include <linux/u64_stats_sync.h>
+ 
+ #include <net/dsfield.h>
+ 
+@@ -954,9 +955,20 @@ static u8 bkn_rcpu_smac[6];
+ /* Driver Proc Entry root */
+ static struct proc_dir_entry *bkn_proc_root = NULL;
+ 
++typedef struct bkn_stats_s {
++    struct u64_stats_sync syncp;
++    u64_stats_t rx_packets;
++    u64_stats_t tx_packets;
++    u64_stats_t rx_bytes;
++    u64_stats_t tx_bytes;
++    u64_stats_t rx_errors;
++    u64_stats_t rx_dropped;
++    u64_stats_t tx_dropped;
++} bkn_stats_t;
++
+ typedef struct bkn_priv_s {
+     struct list_head list;
+-    struct net_device_stats stats;
++    bkn_stats_t stats;
+     struct net_device *dev;
+     bkn_switch_info_t *sinfo;
+     int id;
+@@ -3760,6 +3772,7 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+     int dcbs_done = 0;
+     bkn_dune_system_header_info_t packet_info;
+     uint32_t sand_scratch_data[BKN_SAND_SCRATCH_DATA_SIZE] = {0};
++    unsigned long flags;
+ 
+     dcb_chain = sinfo->rx[chan].api_dcb_chain;
+     if (dcb_chain == NULL) {
+@@ -4002,8 +4015,10 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+                     } else {
+                         skb_put(skb, pktlen - 4); /* Strip CRC */
+                     }
+-                    priv->stats.rx_packets++;
+-                    priv->stats.rx_bytes += skb->len;
++                    flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                    u64_stats_inc(&priv->stats.rx_packets);
++                    u64_stats_add(&priv->stats.rx_bytes, skb->len);
++                    u64_stats_update_end_irqrestore(&priv->stats.syncp, flags);
+ 
+                     /* Optional SKB updates */
+                     KNET_SKB_CB(skb)->dcb_type = sinfo->dcb_type & 0xFFFF;
+@@ -4108,6 +4123,7 @@ bkn_skb_rx_netif_process(bkn_switch_info_t *sinfo, int dest_id, int chan,
+                          int pkt_hdr_size, int pktlen, int ethertype)
+ {
+     bkn_priv_t *priv;
++    unsigned long flags;
+ 
+     DBG_VERB(("Process SKB to netif %d\n", dest_id));
+     priv = bkn_netif_lookup(sinfo, dest_id);
+@@ -4137,8 +4153,10 @@ bkn_skb_rx_netif_process(bkn_switch_info_t *sinfo, int dest_id, int chan,
+         }
+     }
+ 
+-    priv->stats.rx_packets++;
+-    priv->stats.rx_bytes += skb->len;
++    flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++    u64_stats_inc(&priv->stats.rx_packets);
++    u64_stats_add(&priv->stats.rx_bytes, skb->len);
++    u64_stats_update_end_irqrestore(&priv->stats.syncp, flags);
+     skb->dev = priv->dev;
+ 
+     if (knet_rx_cb != NULL) {
+@@ -4148,7 +4166,9 @@ bkn_skb_rx_netif_process(bkn_switch_info_t *sinfo, int dest_id, int chan,
+         if (skb == NULL) {
+             /* Consumed by call-back */
+             sinfo->rx[chan].pkts_d_callback++;
+-            priv->stats.rx_dropped++;
++            flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++            u64_stats_inc(&priv->stats.rx_dropped);
++            u64_stats_update_end_irqrestore(&priv->stats.syncp, flags);
+             return -1;
+         }
+     }
+@@ -4197,6 +4217,7 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+     bkn_priv_t *mpriv;
+     struct sk_buff *mskb = NULL;
+     uint32_t *rx_cb_meta;
++    unsigned long flags;
+ 
+     if (!sinfo->rx[chan].running) {
+         /* Rx not ready */
+@@ -4351,7 +4372,9 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+ 
+             if ((dcb[sinfo->dcb_wsize-1] & 0xf0000) != 0x30000) {
+                 /* Fragment or error */
+-                priv->stats.rx_errors++;
++                flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                u64_stats_inc(&priv->stats.rx_errors);
++                u64_stats_update_end_irqrestore(&priv->stats.syncp, flags);
+                 if (filter && filter->kf.mask.w[err_woff] == 0) {
+                     /* Drop unless DCB status is part of filter */
+                     filter = NULL;
+@@ -4508,8 +4531,10 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+                                 if (mskb == NULL) {
+                                     sinfo->rx[chan].pkts_d_no_skb++;
+                                 } else {
+-                                    mpriv->stats.rx_packets++;
+-                                    mpriv->stats.rx_bytes += mskb->len;
++                                    flags = u64_stats_update_begin_irqsave(&mpriv->stats.syncp);
++                                    u64_stats_inc(&mpriv->stats.rx_packets);
++                                    u64_stats_add(&mpriv->stats.rx_bytes, mskb->len);
++                                    u64_stats_update_end_irqrestore(&mpriv->stats.syncp, flags);
+                                     mskb->dev = mpriv->dev;
+                                     if (filter->kf.mirror_proto) {
+                                         mskb->protocol = filter->kf.mirror_proto;
+@@ -4579,7 +4604,9 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+         } else {
+             DBG_PKT(("Rx packet dropped.\n"));
+             sinfo->rx[chan].pkts_d_no_match++;
+-            priv->stats.rx_dropped++;
++            flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++            u64_stats_inc(&priv->stats.rx_dropped);
++            u64_stats_update_end_irqrestore(&priv->stats.syncp, flags);
+         }
+         dcb[sinfo->dcb_wsize-1] &= ~(1 << 31);
+         if (++sinfo->rx[chan].dirty >= MAX_RX_DCBS) {
+@@ -5795,12 +5822,22 @@ bkn_stop(struct net_device *dev)
+  * Network Device Statistics.
+  * Cleared at init time.
+  */
+-static struct net_device_stats *
+-bkn_get_stats(struct net_device *dev)
++static void
++bkn_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *storage)
+ {
+     bkn_priv_t *priv = netdev_priv(dev);
++    unsigned int start;
+ 
+-    return &priv->stats;
++    do {
++        start = u64_stats_fetch_begin(&priv->stats.syncp);
++        storage->rx_packets = u64_stats_read(&priv->stats.rx_packets);
++        storage->tx_packets = u64_stats_read(&priv->stats.tx_packets);
++        storage->rx_bytes = u64_stats_read(&priv->stats.rx_bytes);
++        storage->tx_bytes = u64_stats_read(&priv->stats.tx_bytes);
++        storage->rx_errors = u64_stats_read(&priv->stats.rx_errors);
++        storage->rx_dropped = u64_stats_read(&priv->stats.rx_dropped);
++        storage->tx_dropped = u64_stats_read(&priv->stats.tx_dropped);
++    } while (u64_stats_fetch_retry(&priv->stats.syncp, start));
+ }
+ 
+ /* Fake multicast ability */
+@@ -5869,7 +5906,7 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+     int sop, idx;
+     uint16_t tpid;
+     uint32_t *metadata;
+-    unsigned long flags;
++    unsigned long flags, stats_flags;
+     uint8_t cpu_channel = 0;
+     int headroom, tailroom;
+ 
+@@ -5877,20 +5914,26 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+ 
+     if (priv->id <= 0) {
+         /* Do not transmit on base device */
+-        priv->stats.tx_dropped++;
++        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++        u64_stats_inc(&priv->stats.tx_dropped);
++        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+         dev_kfree_skb_any(skb);
+         return 0;
+     }
+ 
+     if (device_is_dnx(sinfo) && (skb->len == 0)) {
+-        priv->stats.tx_dropped++;
++        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++        u64_stats_inc(&priv->stats.tx_dropped);
++        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+         dev_kfree_skb_any(skb);
+         return 0;
+     }
+ 
+     if (!netif_carrier_ok(dev)) {
+         DBG_WARN(("Tx drop: Netif link is down.\n"));
+-        priv->stats.tx_dropped++;
++        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++        u64_stats_inc(&priv->stats.tx_dropped);
++        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+         sinfo->tx.pkts_d_no_link++;
+         dev_kfree_skb_any(skb);
+         return 0;
+@@ -5926,7 +5969,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+             rcpulen = RCPU_HDR_SIZE;
+             if (skb->len < (rcpulen + 14)) {
+                 DBG_WARN(("Tx drop: Invalid RCPU encapsulation\n"));
+-                priv->stats.tx_dropped++;
++                stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                u64_stats_inc(&priv->stats.tx_dropped);
++                u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                 sinfo->tx.pkts_d_rcpu_encap++;
+                 dev_kfree_skb_any(skb);
+                 spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -5935,7 +5980,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+             if (check_rcpu_signature &&
+                 PKT_U16_GET(skb->data, 18) != sinfo->rcpu_sig) {
+                 DBG_WARN(("Tx drop: Invalid RCPU signature\n"));
+-                priv->stats.tx_dropped++;
++                stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                u64_stats_inc(&priv->stats.tx_dropped);
++                u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                 sinfo->tx.pkts_d_rcpu_sig++;
+                 dev_kfree_skb_any(skb);
+                 spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -5959,7 +6006,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                     break;
+                 default:
+                     DBG_WARN(("Tx drop: Invalid RCPU meta data\n"));
+-                    priv->stats.tx_dropped++;
++                    stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                    u64_stats_inc(&priv->stats.tx_dropped);
++                    u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                     sinfo->tx.pkts_d_rcpu_meta++;
+                     dev_kfree_skb_any(skb);
+                     spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -5968,7 +6017,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                 if (sinfo->cmic_type != 'x') {
+                     if (skb->len < (rcpulen + RCPU_TX_META_SIZE + 14)) {
+                         DBG_WARN(("Tx drop: Invalid RCPU encapsulation\n"));
+-                        priv->stats.tx_dropped++;
++                        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                        u64_stats_inc(&priv->stats.tx_dropped);
++                        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                         sinfo->tx.pkts_d_rcpu_encap++;
+                         dev_kfree_skb_any(skb);
+                         spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6007,7 +6058,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                                                       GFP_ATOMIC);
+                             if (new_skb == NULL) {
+                                 DBG_WARN(("Tx drop: No SKB memory\n"));
+-                                priv->stats.tx_dropped++;
++                                stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                                u64_stats_inc(&priv->stats.tx_dropped);
++                                u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                                 sinfo->tx.pkts_d_no_skb++;
+                                 dev_kfree_skb_any(skb);
+                                 spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6059,7 +6112,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                                               GFP_ATOMIC);
+                     if (new_skb == NULL) {
+                         DBG_WARN(("Tx drop: No SKB memory\n"));
+-                        priv->stats.tx_dropped++;
++                        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                        u64_stats_inc(&priv->stats.tx_dropped);
++                        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                         sinfo->tx.pkts_d_no_skb++;
+                         dev_kfree_skb_any(skb);
+                         spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6096,7 +6151,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                                                   GFP_ATOMIC);
+                         if (new_skb == NULL) {
+                             DBG_WARN(("Tx drop: No SKB memory\n"));
+-                            priv->stats.tx_dropped++;
++                            stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                            u64_stats_inc(&priv->stats.tx_dropped);
++                            u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                             sinfo->tx.pkts_d_no_skb++;
+                             dev_kfree_skb_any(skb);
+                             spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6135,7 +6192,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+             pktlen = (60 + taglen + hdrlen);
+             if (SKB_PADTO(skb, pktlen) != 0) {
+                 DBG_WARN(("Tx drop: skb_padto failed\n"));
+-                priv->stats.tx_dropped++;
++                stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                u64_stats_inc(&priv->stats.tx_dropped);
++                u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                 sinfo->tx.pkts_d_pad_fail++;
+                 dev_kfree_skb_any(skb);
+                 spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6149,7 +6208,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+             DBG_WARN(("Tx drop: size of pkt (%d) is out of range(%d)\n",
+                      (pktlen + FCS_SZ), SOC_DCB_KNET_COUNT_MASK));
+             sinfo->tx.pkts_d_over_limit++;
+-            priv->stats.tx_dropped++;
++            stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++            u64_stats_inc(&priv->stats.tx_dropped);
++            u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+             dev_kfree_skb_any(skb);
+             spin_unlock_irqrestore(&sinfo->lock, flags);
+             return 0;
+@@ -6309,7 +6370,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+             if (skb == NULL) {
+                 /* Consumed by call-back */
+                 DBG_WARN(("Tx drop: Consumed by call-back\n"));
+-                priv->stats.tx_dropped++;
++                stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                u64_stats_inc(&priv->stats.tx_dropped);
++                u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                 sinfo->tx.pkts_d_callback++;
+                 spin_unlock_irqrestore(&sinfo->lock, flags);
+                 return 0;
+@@ -6323,7 +6386,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                     pktlen = (60 + taglen + hdrlen);
+                     if (SKB_PADTO(skb, pktlen) != 0) {
+                         DBG_WARN(("Tx drop: skb_padto failed\n"));
+-                        priv->stats.tx_dropped++;
++                        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                        u64_stats_inc(&priv->stats.tx_dropped);
++                        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                         sinfo->tx.pkts_d_pad_fail++;
+                         dev_kfree_skb_any(skb);
+                         spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6339,7 +6404,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                 DBG_WARN(("Tx drop: size of pkt (%d) is out of range(%d)\n",
+                          (pktlen + FCS_SZ), SOC_DCB_KNET_COUNT_MASK));
+                 sinfo->tx.pkts_d_over_limit++;
+-                priv->stats.tx_dropped++;
++                stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++                u64_stats_inc(&priv->stats.tx_dropped);
++                u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+                 sinfo->tx.pkts_d_callback++;
+                 dev_kfree_skb_any(skb);
+                 spin_unlock_irqrestore(&sinfo->lock, flags);
+@@ -6391,7 +6458,9 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                                        pktdata, desc->dma_size,
+                                        BKN_DMA_TODEV);
+         if (BKN_DMA_MAPPING_ERROR(sinfo->dma_dev, desc->skb_dma)) {
+-            priv->stats.tx_dropped++;
++            stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++            u64_stats_inc(&priv->stats.tx_dropped);
++            u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+             dev_kfree_skb_any(skb);
+             spin_unlock_irqrestore(&sinfo->lock, flags);
+             return 0;
+@@ -6432,8 +6501,10 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+                           sinfo->tx.desc[sinfo->tx.cur].dcb_dma);
+         }
+ 
+-        priv->stats.tx_packets++;
+-        priv->stats.tx_bytes += (pktlen - 4 - hdrlen);
++        stats_flags = u64_stats_update_begin_irqsave(&priv->stats.syncp);
++        u64_stats_inc(&priv->stats.tx_packets);
++        u64_stats_add(&priv->stats.tx_bytes, pktlen - 4 - hdrlen);
++        u64_stats_update_end_irqrestore(&priv->stats.syncp, stats_flags);
+         sinfo->tx.pkts++;
+     } else {
+         DBG_VERB(("Tx busy: No DMA resources\n"));
+@@ -6730,7 +6801,7 @@ static const struct net_device_ops bkn_netdev_ops = {
+     .ndo_open            = bkn_open,
+     .ndo_stop            = bkn_stop,
+     .ndo_start_xmit      = bkn_tx,
+-    .ndo_get_stats       = bkn_get_stats,
++    .ndo_get_stats64     = bkn_get_stats64,
+     .ndo_validate_addr   = eth_validate_addr,
+     .ndo_set_rx_mode     = bkn_set_multicast_list,
+     .ndo_set_mac_address = eth_mac_addr,
+@@ -6914,7 +6985,6 @@ bkn_init_ndev(u8 *mac, char *name)
+     dev->stop = bkn_stop;
+     dev->set_multicast_list = bkn_set_multicast_list;
+     dev->do_ioctl = NULL;
+-    dev->get_stats = bkn_get_stats;
+     dev->change_mtu = bkn_change_mtu;
+ #ifdef CONFIG_NET_POLL_CONTROLLER
+     dev->poll_controller = bkn_poll_controller;
+@@ -6928,6 +6998,8 @@ bkn_init_ndev(u8 *mac, char *name)
+         strncpy(dev->name, name, IFNAMSIZ-1);
+     }
+ 
++    u64_stats_init(&priv->stats.syncp);
++
+     bkn_dev_net_set(dev, current->nsproxy->net_ns);
+ 
+     DBG_VERB(("Created Ethernet device %s.\n", dev->name));
+-- 
+2.49.0
+

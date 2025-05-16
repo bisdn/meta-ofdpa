@@ -1,7 +1,7 @@
-From e6e159d293336aa858dc9b030596b9d66964ec0f Mon Sep 17 00:00:00 2001
+From 66b1242a93d5e05d34e77d7c0ddbe06eaf635a2e Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 20 Apr 2022 16:35:24 +0200
-Subject: [PATCH 09/14] bcm-knet: fix race between creation and open
+Subject: [PATCH 09/19] bcm-knet: fix race between creation and open
 
 When creating a netif, the netif will be registered and made available
 to userspace before its private data is initialized.
@@ -89,5 +89,5 @@ index 681328485583..9b347a6fe928 100755
          netif_napi_add(dev, &sinfo->napi, bkn_poll, napi_weight);
      }
 -- 
-2.38.1
+2.49.0
 
