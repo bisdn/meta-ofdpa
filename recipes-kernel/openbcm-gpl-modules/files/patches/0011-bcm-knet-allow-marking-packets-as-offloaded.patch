@@ -1,7 +1,7 @@
-From c03281e4a0fc0ce564df368875f9c009c1ebc0f7 Mon Sep 17 00:00:00 2001
+From 535f8430806f374b800c89da04c42c74d00a407d Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 26 Sep 2022 10:34:45 +0200
-Subject: [PATCH 11/14] bcm-knet: allow marking packets as offloaded
+Subject: [PATCH 11/19] bcm-knet: allow marking packets as offloaded
 
 When using KNET interfaces in a bridge, Linux will flood or forward any
 packets it sees according to default rules. This can be undesirable when
@@ -95,5 +95,5 @@ index 329f1066a511..dd36bd125865 100755
                      gprintk("Warning: unknown link state setting: '%s'\n", ptr);
                  }
 -- 
-2.38.1
+2.49.0
 

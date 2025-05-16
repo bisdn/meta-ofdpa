@@ -1,0 +1,245 @@
+From a1469e8668746b1382a4b045844c3eeae88fbff2 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Thu, 15 May 2025 11:56:06 +0200
+Subject: [PATCH 19/19] bcm-knet: expose hw counters on port netifs
+
+Now that we can we have a message for updating hw counters on netifs,
+handle in in the kernel driver and expose them as regular stats on port
+type netifs.
+
+Since the software counters are still interesting, delegate them to
+IFLA_OFFLOAD_XSTATS_CPU_HIT type offload stats, which seem to be the
+most appropriate.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 175 +++++++++++++++++-
+ 1 file changed, 165 insertions(+), 10 deletions(-)
+
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 0c2b6c5fa65b..6da8262aeca0 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -966,9 +966,31 @@ typedef struct bkn_stats_s {
+     u64_stats_t tx_dropped;
+ } bkn_stats_t;
+ 
++typedef struct bkn_hw_stats_s {
++    struct u64_stats_sync syncp;
++    u64_stats_t port_in_frames;
++    u64_stats_t port_out_frames;
++    u64_stats_t if_in_octets;
++    u64_stats_t if_out_octets;
++    u64_stats_t if_in_errors;
++    u64_stats_t if_out_errors;
++    u64_stats_t if_in_discards;
++    u64_stats_t if_out_discards;
++    u64_stats_t if_in_mcast_packets;
++    u64_stats_t if_collisions;
++    u64_stats_t dot3_in_range_length_errors;
++    u64_stats_t dot3_frame_too_long_errors;
++    u64_stats_t dot3_fcs_errors;
++    u64_stats_t dot3_alignment_errors;
++    u64_stats_t dot3_carrier_sense_errors;
++    u64_stats_t dot3_sqe_test_errors;
++    u64_stats_t dot3_late_collisions;
++} bkn_hw_stats_t;
++
+ typedef struct bkn_priv_s {
+     struct list_head list;
+     bkn_stats_t stats;
++    bkn_hw_stats_t hw_stats;
+     struct net_device *dev;
+     bkn_switch_info_t *sinfo;
+     int id;
+@@ -5828,16 +5850,86 @@ bkn_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *storage)
+     bkn_priv_t *priv = netdev_priv(dev);
+     unsigned int start;
+ 
+-    do {
+-        start = u64_stats_fetch_begin(&priv->stats.syncp);
+-        storage->rx_packets = u64_stats_read(&priv->stats.rx_packets);
+-        storage->tx_packets = u64_stats_read(&priv->stats.tx_packets);
+-        storage->rx_bytes = u64_stats_read(&priv->stats.rx_bytes);
+-        storage->tx_bytes = u64_stats_read(&priv->stats.tx_bytes);
+-        storage->rx_errors = u64_stats_read(&priv->stats.rx_errors);
+-        storage->rx_dropped = u64_stats_read(&priv->stats.rx_dropped);
+-        storage->tx_dropped = u64_stats_read(&priv->stats.tx_dropped);
+-    } while (u64_stats_fetch_retry(&priv->stats.syncp, start));
++    if (priv->type == KCOM_NETIF_T_PORT) {
++        do {
++            start = u64_stats_fetch_begin(&priv->hw_stats.syncp);
++            storage->rx_packets = u64_stats_read(&priv->hw_stats.port_in_frames);
++            storage->tx_packets = u64_stats_read(&priv->hw_stats.port_out_frames);
++            storage->rx_bytes = u64_stats_read(&priv->hw_stats.if_in_octets);
++            /* substract fcs */
++            storage->rx_bytes -= storage->rx_packets * 4;
++            storage->tx_bytes = u64_stats_read(&priv->hw_stats.if_out_octets);
++            /* substract fcs */
++            storage->tx_bytes -= storage->tx_packets * 4;
++            storage->rx_errors = u64_stats_read(&priv->hw_stats.if_in_errors);
++            storage->tx_errors = u64_stats_read(&priv->hw_stats.if_out_errors);
++            storage->rx_dropped = u64_stats_read(&priv->hw_stats.if_in_discards);
++            storage->tx_dropped = u64_stats_read(&priv->hw_stats.if_out_discards);
++            storage->multicast = u64_stats_read(&priv->hw_stats.if_in_mcast_packets);
++            storage->rx_length_errors = u64_stats_read(&priv->hw_stats.dot3_in_range_length_errors) +
++                                        u64_stats_read(&priv->hw_stats.dot3_frame_too_long_errors);
++            storage->rx_crc_errors = u64_stats_read(&priv->hw_stats.dot3_fcs_errors);
++            storage->rx_frame_errors = u64_stats_read(&priv->hw_stats.dot3_alignment_errors);
++            storage->tx_carrier_errors = u64_stats_read(&priv->hw_stats.dot3_carrier_sense_errors);
++            storage->tx_heartbeat_errors = u64_stats_read(&priv->hw_stats.dot3_sqe_test_errors);
++            storage->tx_window_errors = u64_stats_read(&priv->hw_stats.dot3_late_collisions);
++        } while (u64_stats_fetch_retry(&priv->hw_stats.syncp, start));
++    } else {
++        do {
++            start = u64_stats_fetch_begin(&priv->stats.syncp);
++            storage->rx_packets = u64_stats_read(&priv->stats.rx_packets);
++            storage->tx_packets = u64_stats_read(&priv->stats.tx_packets);
++            storage->rx_bytes = u64_stats_read(&priv->stats.rx_bytes);
++            storage->tx_bytes = u64_stats_read(&priv->stats.tx_bytes);
++            storage->rx_errors = u64_stats_read(&priv->stats.rx_errors);
++            storage->rx_dropped = u64_stats_read(&priv->stats.rx_dropped);
++            storage->tx_dropped = u64_stats_read(&priv->stats.tx_dropped);
++        } while (u64_stats_fetch_retry(&priv->stats.syncp, start));
++    }
++}
++
++static bool
++bkn_has_offload_stats(const struct net_device *dev, int attr_id)
++{
++    bkn_priv_t *priv = netdev_priv(dev);
++
++    if (priv->type != KCOM_NETIF_T_PORT)
++        return false;
++
++    switch (attr_id) {
++    case IFLA_OFFLOAD_XSTATS_CPU_HIT:
++        return true;
++    }
++
++    return false;
++}
++
++static int
++bkn_get_offload_stats(int attr_id, const struct net_device *dev, void *attr_data)
++{
++    struct rtnl_link_stats64 *storage = (struct rtnl_link_stats64 *)attr_data;
++    bkn_priv_t *priv = netdev_priv(dev);
++    unsigned int start;
++
++    if (priv->type != KCOM_NETIF_T_PORT)
++        return -EINVAL;
++
++    switch (attr_id) {
++    case IFLA_OFFLOAD_XSTATS_CPU_HIT:
++        do {
++            start = u64_stats_fetch_begin(&priv->stats.syncp);
++            storage->rx_packets = u64_stats_read(&priv->stats.rx_packets);
++            storage->tx_packets = u64_stats_read(&priv->stats.tx_packets);
++            storage->rx_bytes = u64_stats_read(&priv->stats.rx_bytes);
++            storage->tx_bytes = u64_stats_read(&priv->stats.tx_bytes);
++            storage->rx_errors = u64_stats_read(&priv->stats.rx_errors);
++            storage->rx_dropped = u64_stats_read(&priv->stats.rx_dropped);
++            storage->tx_dropped = u64_stats_read(&priv->stats.tx_dropped);
++        } while (u64_stats_fetch_retry(&priv->stats.syncp, start));
++        return 0;
++    }
++
++    return -EINVAL;
+ }
+ 
+ /* Fake multicast ability */
+@@ -6802,6 +6894,8 @@ static const struct net_device_ops bkn_netdev_ops = {
+     .ndo_stop            = bkn_stop,
+     .ndo_start_xmit      = bkn_tx,
+     .ndo_get_stats64     = bkn_get_stats64,
++    .ndo_has_offload_stats = bkn_has_offload_stats,
++    .ndo_get_offload_stats = bkn_get_offload_stats,
+     .ndo_validate_addr   = eth_validate_addr,
+     .ndo_set_rx_mode     = bkn_set_multicast_list,
+     .ndo_set_mac_address = eth_mac_addr,
+@@ -6999,6 +7093,7 @@ bkn_init_ndev(u8 *mac, char *name)
+     }
+ 
+     u64_stats_init(&priv->stats.syncp);
++    u64_stats_init(&priv->hw_stats.syncp);
+ 
+     bkn_dev_net_set(dev, current->nsproxy->net_ns);
+ 
+@@ -9337,6 +9432,61 @@ bkn_knet_wb_cleanup(kcom_msg_wb_cleanup_t *kmsg, int len)
+     return sizeof(kcom_msg_hdr_t);
+ }
+ 
++static int
++bkn_knet_netif_stats(kcom_msg_netif_stats_t *kmsg, int len)
++{
++    unsigned long flags, stat_flags;
++    bkn_switch_info_t *sinfo;
++    bkn_priv_t *priv;
++
++    kmsg->hdr.type = KCOM_MSG_TYPE_RSP;
++
++    sinfo = bkn_sinfo_from_unit(kmsg->hdr.unit);
++    if (sinfo == NULL) {
++        kmsg->hdr.status = KCOM_E_PARAM;
++        return sizeof(kcom_msg_hdr_t);
++    }
++
++    spin_lock_irqsave(&sinfo->lock, flags);
++
++    priv = bkn_netif_lookup(sinfo, kmsg->hdr.id);
++
++    if (priv == NULL) {
++        spin_unlock_irqrestore(&sinfo->lock, flags);
++        kmsg->hdr.status = KCOM_E_NOT_FOUND;
++        return sizeof(kcom_msg_hdr_t);
++    }
++
++#define COPY_COUNTER(dst, src, counter) \
++    u64_stats_set(&(dst).counter, (src).counter)
++
++    stat_flags = u64_stats_update_begin_irqsave(&priv->hw_stats.syncp);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, port_in_frames);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, port_out_frames);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_in_octets);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_out_octets);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_in_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_out_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_in_discards);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_out_discards);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_in_mcast_packets);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, if_collisions);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_in_range_length_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_frame_too_long_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_fcs_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_alignment_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_carrier_sense_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_sqe_test_errors);
++    COPY_COUNTER(priv->hw_stats, kmsg->netif_stats, dot3_late_collisions);
++    u64_stats_update_end_irqrestore(&priv->hw_stats.syncp, stat_flags);
++
++#undef COPY_COUNTER
++
++    spin_unlock_irqrestore(&sinfo->lock, flags);
++
++    return sizeof(kcom_msg_hdr_t);
++}
++
+ static int
+ bkn_handle_cmd_req(kcom_msg_t *kmsg, int len)
+ {
+@@ -9460,6 +9610,11 @@ bkn_handle_cmd_req(kcom_msg_t *kmsg, int len)
+             len = sizeof(kcom_msg_hdr_t);
+         }
+         break;
++     case KCOM_M_NETIF_STATS:
++        DBG_CMD(("KCOM_M_WB_CLEANUP\n"));
++        /* Update netif hardware counters */
++        len = bkn_knet_netif_stats(&kmsg->netif_stats, len);
++        break;
+     default:
+         DBG_WARN(("Unsupported command (type=%d, opcode=%d)\n",
+                   kmsg->hdr.type, kmsg->hdr.opcode));
+-- 
+2.49.0
+

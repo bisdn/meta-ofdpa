@@ -1,7 +1,7 @@
-From d4e7aed84944407c97e6a9413e98048789f7cac2 Mon Sep 17 00:00:00 2001
+From eb4c8fcd136a3c85bff58b7c98f9ade923db98e3 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:54:54 +0100
-Subject: [PATCH 03/14] linux-kernel-bde: update API usage for 5.10
+Subject: [PATCH 03/19] linux-kernel-bde: update API usage for 5.10
 
 ---
  sdk-6.5.24/systems/bde/linux/include/linux_dma.h          | 2 +-
@@ -58,5 +58,5 @@ index 7628fd92c414..141bd53dade6 100644
  #define HX5_IHOST_GICD_ISENABLERN_0        (0x10781100)
  #define HX5_IHOST_GICD_ISENABLERN_1        (0x10781104)
 -- 
-2.38.1
+2.49.0
 

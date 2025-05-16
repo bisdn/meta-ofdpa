@@ -1,7 +1,7 @@
-From 88564ed49737d47986b859c3fcadce9a0ac6a19a Mon Sep 17 00:00:00 2001
+From af0023f4e05da89fe3e46a1681f11b034fb5f8ab Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:55:39 +0100
-Subject: [PATCH 01/14] gmodule: update proc code for linux 5.6+
+Subject: [PATCH 01/19] gmodule: update proc code for linux 5.6+
 
 ---
  .../systems/linux/kernel/modules/shared/gmodule.c      | 10 ++++++++++
@@ -36,5 +36,5 @@ index 0635b811ed8e..55a9ffc6c350 100644
  int
  gmodule_vpprintf(char** page_ptr, const char* fmt, va_list args)
 -- 
-2.38.1
+2.49.0
 

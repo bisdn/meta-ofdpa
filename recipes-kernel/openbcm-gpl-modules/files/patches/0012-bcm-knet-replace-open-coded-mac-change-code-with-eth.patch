@@ -1,7 +1,7 @@
-From a8917b2bcbbdbe6f137308e8f3297509bdf82f71 Mon Sep 17 00:00:00 2001
+From 754d1b1517b9f211172770aa309e1dd048f97c2b Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 18 Nov 2022 16:24:41 +0100
-Subject: [PATCH 12/14] bcm-knet: replace open coded mac change code with
+Subject: [PATCH 12/19] bcm-knet: replace open coded mac change code with
  eth_mac_addr
 
 Linux 5.17 made netdev->dev_addr[] constant, so we cannot modify it
@@ -60,5 +60,5 @@ index dd36bd125865..3abacd4a1f1e 100755
      dev->open = bkn_open;
      dev->hard_start_xmit = bkn_tx;
 -- 
-2.38.1
+2.49.0
 

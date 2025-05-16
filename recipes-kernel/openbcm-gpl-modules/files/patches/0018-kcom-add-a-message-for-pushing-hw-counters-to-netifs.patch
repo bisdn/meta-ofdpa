@@ -1,0 +1,87 @@
+From 63cff5d34b4a27c1aeb7c45d4a9e75b0cfb4e536 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Thu, 15 May 2025 11:39:24 +0200
+Subject: [PATCH 18/19] kcom: add a message for pushing hw counters to netifs
+
+In order to expose hw counters directly on knet interfaces, add a
+message to push them out.
+
+For now only use a subset of counters to keep the size reasonable,
+selected by matching the available counters [1] to rtnl_link_stats64
+from the kernel [2].
+
+[1] https://github.com/Broadcom-Network-Switching-Software/OpenBCM/blob/master/sdk-6.5.24/include/bcm/stat.h
+[2] https://elixir.bootlin.com/linux/v6.6.90/source/include/uapi/linux/if_link.h#L42
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.24/include/kcom.h | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/sdk-6.5.24/include/kcom.h b/sdk-6.5.24/include/kcom.h
+index 028a2c771a4e..07a0618154ac 100755
+--- a/sdk-6.5.24/include/kcom.h
++++ b/sdk-6.5.24/include/kcom.h
+@@ -50,6 +50,8 @@
+ 
+ #define KCOM_VERSION            13 /* Protocol version */
+ 
++#define KCOM_M_NETIF_STATS	128 /* Netif stats */
++
+ /*
+  * Message status codes
+  */
+@@ -347,6 +349,26 @@ typedef struct kcom_clock_info_s {
+     int32 data[8];
+ } kcom_clock_info_t;
+ 
++typedef struct kcom_netif_stats_s {
++    uint64 port_in_frames;
++    uint64 port_out_frames;
++    uint64 if_in_octets;
++    uint64 if_out_octets;
++    uint64 if_in_errors;
++    uint64 if_out_errors;
++    uint64 if_in_discards;
++    uint64 if_out_discards;
++    uint64 if_in_mcast_packets;
++    uint64 if_collisions;
++    uint64 dot3_in_range_length_errors;
++    uint64 dot3_frame_too_long_errors;
++    uint64 dot3_fcs_errors;
++    uint64 dot3_alignment_errors;
++    uint64 dot3_carrier_sense_errors;
++    uint64 dot3_sqe_test_errors;
++    uint64 dot3_late_collisions;
++} kcom_netif_stats_t;
++
+ /*
+  * Send literal string to/from kernel module.
+  * Mainly for debugging purposes.
+@@ -554,6 +576,15 @@ typedef struct kcom_msg_hw_info_s {
+     kcom_oamp_info_t oamp_info;
+ } kcom_msg_hw_info_t;
+ 
++/*
++ * Netif stats
++ */
++
++typedef struct kcom_msg_netif_stats_s {
++    kcom_msg_hdr_t hdr;
++    kcom_netif_stats_t netif_stats;
++} kcom_msg_netif_stats_t;
++
+ /*
+  * All messages (e.g. for generic receive)
+  */
+@@ -580,6 +611,7 @@ typedef union kcom_msg_s {
+     kcom_msg_dbg_pkt_get_t dbg_pkt_get;
+     kcom_msg_wb_cleanup_t wb_cleanup;
+     kcom_msg_clock_cmd_t clock_cmd;
++    kcom_msg_netif_stats_t netif_stats;
+ } kcom_msg_t;
+ 
+ /*
+-- 
+2.49.0
+

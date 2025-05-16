@@ -1,0 +1,33 @@
+From abbde684f9f07dcc932ef89833291fdb05727f47 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Wed, 14 May 2025 15:47:49 +0200
+Subject: [PATCH 16/19] bcm-knet: fix reported tx bytes
+
+Do not include FCS and custom data header in tx byte counts. The custom
+header is never transmitted on the wire and consumed by the ASIC, so we
+should not count it, and we do not count it for rx bytes.
+
+Likewise, rx and tx bytes should exclude the FCS, so we need to
+substract it here as well.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 7834cdb29852..0dac8ec479d9 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -6433,7 +6433,7 @@ bkn_tx(struct sk_buff *skb, struct net_device *dev)
+         }
+ 
+         priv->stats.tx_packets++;
+-        priv->stats.tx_bytes += pktlen;
++        priv->stats.tx_bytes += (pktlen - 4 - hdrlen);
+         sinfo->tx.pkts++;
+     } else {
+         DBG_VERB(("Tx busy: No DMA resources\n"));
+-- 
+2.49.0
+

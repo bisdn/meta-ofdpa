@@ -1,7 +1,7 @@
-From e7b7f050d9b9dfe58134a0b67aa107ebee9fb6eb Mon Sep 17 00:00:00 2001
+From 35a5b11b6a3e79488c9278454a410bffe81e6b66 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 6 May 2024 11:25:49 +0200
-Subject: [PATCH] bcm-knet: extract and update DSCP for IP packets
+Subject: [PATCH 15/19] bcm-knet: extract and update DSCP for IP packets
 
 For currently unknown reasons the Broadcom ASIC does not update the DSCP
 field for packets sent to controller. But the DMA header does have the
@@ -14,7 +14,7 @@ Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
  1 file changed, 76 insertions(+)
 
 diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
-index 1e5436702cf3..3b22016c047c 100755
+index d8e14f9da5c8..7834cdb29852 100755
 --- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 +++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
 @@ -68,6 +68,7 @@
@@ -25,7 +25,7 @@ index 1e5436702cf3..3b22016c047c 100755
  
  MODULE_AUTHOR("Broadcom Corporation");
  MODULE_DESCRIPTION("Network Device Driver for Broadcom BCM TxRx API");
-@@ -2139,6 +2140,77 @@ bkn_pkt_is_rx_untagged(bkn_switch_info_t *sinfo, uint32_t *meta)
+@@ -2151,6 +2152,77 @@ bkn_pkt_is_rx_untagged(bkn_switch_info_t *sinfo, uint32_t *meta)
      }
  }
  
@@ -103,7 +103,7 @@ index 1e5436702cf3..3b22016c047c 100755
  static bkn_switch_info_t *
  bkn_sinfo_from_unit(int unit)
  {
-@@ -3909,6 +3981,8 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+@@ -3921,6 +3993,8 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
                          }
                      }
  
@@ -112,7 +112,7 @@ index 1e5436702cf3..3b22016c047c 100755
                      skb_copy_to_linear_data(skb, pkt, pktlen);
                      if (device_is_sand(sinfo)) {
                          /* CRC has been stripped */
-@@ -4362,6 +4436,8 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+@@ -4374,6 +4448,8 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
                          }
                      }
  
@@ -122,5 +122,5 @@ index 1e5436702cf3..3b22016c047c 100755
                          rx_cb_meta = sand_scratch_data;
                      } else {
 -- 
-2.44.0
+2.49.0
 
