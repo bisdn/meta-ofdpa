@@ -2,10 +2,10 @@ SUMMARY = "OF-DPA platform configuration"
 DESCRIPTION = "Switch ASIC platform configuration files for OF-DPA (Broadcom SDK)"
 
 LICENSE = "Broadcom-OpenBCM & Apache-2.0"
-NO_GENERIC_LICENSE[Broadcom-OpenBCM] = "${WORKDIR}/LICENSE.Broadcom-OpenBCM"
+NO_GENERIC_LICENSE[Broadcom-OpenBCM] = "../LICENSE.Broadcom-OpenBCM"
 LIC_FILES_CHKSUM = "\
-    file://${WORKDIR}/LICENSE.Broadcom-OpenBCM;md5=1513e460208bceb2722d7e38e260aa44 \
-    file://${WORKDIR}/git/LICENSE;md5=31b8e124402d908f7a5fd17902e7d4e7 \
+    file://../LICENSE.Broadcom-OpenBCM;md5=1513e460208bceb2722d7e38e260aa44 \
+    file://LICENSE;md5=31b8e124402d908f7a5fd17902e7d4e7 \
 "
 
 # head of master as of 2023-9-20
