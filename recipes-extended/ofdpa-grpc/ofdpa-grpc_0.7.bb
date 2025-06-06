@@ -4,7 +4,7 @@ inherit systemd
 
 include ofdpa-grpc.inc
 
-SRCREV = "a323a61ca506f5b9f9691e559a2c5b833c619435"
+SRCREV = "a4de834e81cfc8b6f6767379a763650088db9faa"
 
 DEPENDS += "grpc gflags glog protobuf openssl ofdpa systemd"
 
