@@ -1,0 +1,88 @@
+From 6bdeca9e704ff4a48318601f2a48ad589ef9dbbf Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Wed, 23 Apr 2025 14:37:20 +0200
+Subject: [PATCH 20/20] bcm-knet: do not mark BPDU packets as offloaded
+
+BPDU packets are trapped to controller and never forwarded, so do not
+mark them as offloaded. This allows them to be forwarded/flooded in
+software if needed.
+
+Note that this requires configuring the switch ASIC to mark traffic as
+BPDU via appropriate L2 cache entries, and there is no inherent
+automatic classification.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 42 ++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 6da8262aeca0..e3728c73a7d7 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -2186,6 +2186,42 @@ bkn_pkt_is_rx_untagged(bkn_switch_info_t *sinfo, uint32_t *meta)
+     }
+ }
+ 
++
++#ifdef CONFIG_NET_SWITCHDEV
++
++#define DCB23_T13_BPDU  (1u << 17)
++#define DCB28_T6_BPDU   (1u << 30)
++#define DCB36_T11_BPDU  (1u << 0)
++
++static inline int
++bkn_pkt_was_switched(bkn_switch_info_t *sinfo, uint32_t *meta)
++{
++    /* BPDU packets are never switched */
++    switch (sinfo->dcb_type) {
++    case 28:
++         /* DPP */
++        return (meta[6] & DCB28_T6_BPDU) == 0;
++    case 23:
++    case 24:
++    case 26:
++    case 29:
++    case 31:
++    case 32:
++    case 34:
++    case 35:
++    case 37:
++         /* Triumph3 and newer */
++        return (meta[13] & DCB23_T13_BPDU) == 0;
++    case 36:
++        /* Trident 3 */
++        return (meta[11] & DCB36_T11_BPDU) == 0;
++    default:
++        /* currently unhandled */
++        return 1;
++    }
++}
++#endif
++
+ static inline uint8_t
+ bkn_pkt_new_dscp(bkn_switch_info_t *sinfo, uint32_t *meta)
+ {
+@@ -4082,7 +4118,8 @@ bkn_do_api_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+                     DBG_DUNE(("skb protocol 0x%04x\n", skb->protocol));
+ 
+ #ifdef CONFIG_NET_SWITCHDEV
+-		    skb->offload_fwd_mark = priv->offload_fwd_mark;
++                    if (priv->offload_fwd_mark)
++                        skb->offload_fwd_mark = bkn_pkt_was_switched(sinfo, meta);
+ #endif
+                     /*
+                      * Disable configuration API while the spinlock is released.
+@@ -4525,7 +4562,8 @@ bkn_do_skb_rx(bkn_switch_info_t *sinfo, int chan, int budget)
+                     }
+ 
+ #ifdef CONFIG_NET_SWITCHDEV
+-		    skb->offload_fwd_mark = priv->offload_fwd_mark;
++                    if (priv->offload_fwd_mark)
++                        skb->offload_fwd_mark = bkn_pkt_was_switched(sinfo, meta);
+ #endif
+                     if (mirror_local) {
+                         if (mskb) {
+-- 
+2.50.1
+

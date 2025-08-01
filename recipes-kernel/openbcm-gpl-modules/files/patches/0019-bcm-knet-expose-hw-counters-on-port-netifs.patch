@@ -1,7 +1,7 @@
 From a1469e8668746b1382a4b045844c3eeae88fbff2 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Thu, 15 May 2025 11:56:06 +0200
-Subject: [PATCH 19/19] bcm-knet: expose hw counters on port netifs
+Subject: [PATCH 19/20] bcm-knet: expose hw counters on port netifs
 
 Now that we can we have a message for updating hw counters on netifs,
 handle in in the kernel driver and expose them as regular stats on port
@@ -241,5 +241,5 @@ index 0c2b6c5fa65b..6da8262aeca0 100755
          DBG_WARN(("Unsupported command (type=%d, opcode=%d)\n",
                    kmsg->hdr.type, kmsg->hdr.opcode));
 -- 
-2.49.0
+2.50.1
 
