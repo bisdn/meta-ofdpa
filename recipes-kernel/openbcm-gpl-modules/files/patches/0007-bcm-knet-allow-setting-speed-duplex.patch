@@ -1,7 +1,7 @@
 From 8b7522199a3e718dcecf55f8dd361a07ce435ff2 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 7 Feb 2022 14:28:11 +0100
-Subject: [PATCH 07/19] bcm-knet: allow setting speed/duplex
+Subject: [PATCH 07/20] bcm-knet: allow setting speed/duplex
 
 To allow better emulation of physical port devices, extend the link
 state settings to also include link speed and duplex.
@@ -115,5 +115,5 @@ index e03de2b76fa3..eecd60db14e8 100755
              spin_unlock_irqrestore(&sinfo->lock, flags);
              return count;
 -- 
-2.49.0
+2.50.1
 
