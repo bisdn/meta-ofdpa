@@ -1,7 +1,7 @@
 From 35a5b11b6a3e79488c9278454a410bffe81e6b66 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 6 May 2024 11:25:49 +0200
-Subject: [PATCH 15/19] bcm-knet: extract and update DSCP for IP packets
+Subject: [PATCH 15/20] bcm-knet: extract and update DSCP for IP packets
 
 For currently unknown reasons the Broadcom ASIC does not update the DSCP
 field for packets sent to controller. But the DMA header does have the
@@ -122,5 +122,5 @@ index d8e14f9da5c8..7834cdb29852 100755
                          rx_cb_meta = sand_scratch_data;
                      } else {
 -- 
-2.49.0
+2.50.1
 

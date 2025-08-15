@@ -31,6 +31,7 @@ SRC_URI = " \
           file://patches/0017-bcm-knet-switch-to-stat64.patch;striplevel=2 \
           file://patches/0018-kcom-add-a-message-for-pushing-hw-counters-to-netifs.patch;striplevel=2 \
           file://patches/0019-bcm-knet-expose-hw-counters-on-port-netifs.patch;striplevel=2 \
+          file://patches/0020-bcm-knet-do-not-mark-BPDU-packets-as-offloaded.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \
