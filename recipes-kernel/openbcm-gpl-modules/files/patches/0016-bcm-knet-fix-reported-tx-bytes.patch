@@ -1,7 +1,7 @@
-From abbde684f9f07dcc932ef89833291fdb05727f47 Mon Sep 17 00:00:00 2001
+From ab8b2cee520fa95fcea036115221cac201e1ae79 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 14 May 2025 15:47:49 +0200
-Subject: [PATCH 16/20] bcm-knet: fix reported tx bytes
+Subject: [PATCH 16/22] bcm-knet: fix reported tx bytes
 
 Do not include FCS and custom data header in tx byte counts. The custom
 header is never transmitted on the wire and consumed by the ASIC, so we
@@ -29,5 +29,5 @@ index 7834cdb29852..0dac8ec479d9 100755
      } else {
          DBG_VERB(("Tx busy: No DMA resources\n"));
 -- 
-2.50.1
+2.51.0
 
