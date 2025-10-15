@@ -1,7 +1,7 @@
-From 63cff5d34b4a27c1aeb7c45d4a9e75b0cfb4e536 Mon Sep 17 00:00:00 2001
+From 34848c5689905f7be8b606c0bd6d4958707c0f23 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Thu, 15 May 2025 11:39:24 +0200
-Subject: [PATCH 18/20] kcom: add a message for pushing hw counters to netifs
+Subject: [PATCH 18/22] kcom: add a message for pushing hw counters to netifs
 
 In order to expose hw counters directly on knet interfaces, add a
 message to push them out.
@@ -83,5 +83,5 @@ index 028a2c771a4e..07a0618154ac 100755
  
  /*
 -- 
-2.50.1
+2.51.0
 
