@@ -1,0 +1,129 @@
+From 81e5bac1ae14fa296cdd2670717127a15b210221 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 10 Nov 2025 11:19:13 +0100
+Subject: [PATCH 24/24] bcm-knet: add support for updating link state in kernel
+
+Add support for handling KCOM_M_NETIF_STATE messages and update any
+matching port interfaces on reception.
+
+Only update ports created with the flag KCOM_NETIF_F_SDK_STATE.
+
+For ports created with this flag, ignore any port state updates via the
+old interface.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 71 +++++++++++++++++--
+ 1 file changed, 66 insertions(+), 5 deletions(-)
+
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 429022b05f38..7992b6ff5f24 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -7258,16 +7258,21 @@ bkn_proc_link_write(struct file *file, const char *buf,
+ 
+             while ((ptr = strsep(&tmp, ",")) != NULL) {
+                 if (strcmp(ptr, "up") == 0) {
+-                    netif_carrier_on(dev);
++                    if (!(priv->flags & KCOM_NETIF_F_SDK_STATE))
++                        netif_carrier_on(dev);
+                 } else if (strcmp(ptr, "down") == 0) {
+-                    netif_carrier_off(dev);
++                    if (!(priv->flags & KCOM_NETIF_F_SDK_STATE))
++                        netif_carrier_off(dev);
+                 } else if (strcmp(ptr, "fd") == 0) {
+-                    priv->duplex = DUPLEX_FULL;
++                    if (!(priv->flags & KCOM_NETIF_F_SDK_STATE))
++                        priv->duplex = DUPLEX_FULL;
+                 } else if (strcmp(ptr, "hd") == 0) {
+-                    priv->duplex = DUPLEX_HALF;
++                    if (!(priv->flags & KCOM_NETIF_F_SDK_STATE))
++                        priv->duplex = DUPLEX_HALF;
+                 } else if (sscanf(ptr, "%d", &speed) == 1 &&
+                            ethtool_validate_speed(speed) == 1) {
+-                    priv->speed = speed;
++                    if (!(priv->flags & KCOM_NETIF_F_SDK_STATE))
++                        priv->speed = speed;
+                 } else if (strcmp(ptr, "offload") == 0) {
+                     priv->offload_fwd_mark = 1;
+                 } else if (strcmp(ptr, "no-offload") == 0) {
+@@ -8910,6 +8915,13 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+         kmsg->hdr.status = KCOM_E_PARAM;
+         return sizeof(kcom_msg_hdr_t);
+     }
++
++    if (kmsg->netif.type != KCOM_NETIF_T_PORT &&
++        (kmsg->netif.flags & KCOM_NETIF_F_SDK_STATE)) {
++        kmsg->hdr.status = KCOM_E_PARAM;
++        return sizeof(kcom_msg_hdr_t);
++    }
++
+     sinfo = bkn_sinfo_from_unit(kmsg->hdr.unit);
+     if (sinfo == NULL) {
+         kmsg->hdr.status = KCOM_E_PARAM;
+@@ -9529,6 +9541,50 @@ bkn_knet_netif_stats(kcom_msg_netif_stats_t *kmsg, int len)
+     return sizeof(kcom_msg_hdr_t);
+ }
+ 
++static int
++bkn_knet_netif_state(kcom_msg_netif_state_t *kmsg, int len)
++{
++    bkn_switch_info_t *sinfo;
++    struct list_head *list;
++    unsigned long flags;
++    bkn_priv_t *priv;
++
++    kmsg->hdr.type = KCOM_MSG_TYPE_RSP;
++
++    sinfo = bkn_sinfo_from_unit(kmsg->hdr.unit);
++    if (sinfo == NULL) {
++        kmsg->hdr.status = KCOM_E_PARAM;
++        return sizeof(kcom_msg_hdr_t);
++    }
++
++    spin_lock_irqsave(&sinfo->lock, flags);
++
++    list_for_each(list, &sinfo->ndev_list) {
++        priv = (bkn_priv_t *)list;
++
++        if (priv->type != KCOM_NETIF_T_PORT)
++            continue;
++
++        if (!(priv->flags & KCOM_NETIF_F_SDK_STATE))
++            continue;
++
++        if (priv->port != kmsg->netif_state.port)
++            continue;
++
++        if (kmsg->netif_state.link) {
++            priv->duplex = kmsg->netif_state.duplex;
++            priv->speed = kmsg->netif_state.speed;
++            netif_carrier_on(priv->dev);
++        } else {
++            netif_carrier_off(priv->dev);
++        }
++    }
++
++    spin_unlock_irqrestore(&sinfo->lock, flags);
++
++    return sizeof(kcom_msg_hdr_t);
++}
++
+ static int
+ bkn_handle_cmd_req(kcom_msg_t *kmsg, int len)
+ {
+@@ -9657,6 +9713,11 @@ bkn_handle_cmd_req(kcom_msg_t *kmsg, int len)
+         /* Update netif hardware counters */
+         len = bkn_knet_netif_stats(&kmsg->netif_stats, len);
+         break;
++     case KCOM_M_NETIF_STATE:
++        DBG_CMD(("KCOM_M_NETIF_STATE\n"));
++        /* Update netif link state */
++        len = bkn_knet_netif_state(&kmsg->netif_state, len);
++        break;
+     default:
+         DBG_WARN(("Unsupported command (type=%d, opcode=%d)\n",
+                   kmsg->hdr.type, kmsg->hdr.opcode));
+-- 
+2.51.0
+

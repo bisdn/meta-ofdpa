@@ -1,7 +1,7 @@
-From 305646bb718fb3186ee7236d86e0b2de400189d1 Mon Sep 17 00:00:00 2001
+From fc3227578b65ea8bb826d61f063d9382848e936b Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 18 Nov 2022 16:12:08 +0100
-Subject: [PATCH 04/22] bcm-knet: update API for linux 5.6.0
+Subject: [PATCH 04/24] bcm-knet: update API for linux 5.6.0
 
 ---
  .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 71 ++++++++++++++++++-

@@ -1,7 +1,7 @@
-From 7db35aad9d9de930aa846bbf45c5e1561d53e123 Mon Sep 17 00:00:00 2001
+From 529a2de7fd24ae0d27e0cceee29b76a6a5bac4e6 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 18 Nov 2022 16:46:01 +0100
-Subject: [PATCH 13/22] bcm-knet: update API for kernel 5.19
+Subject: [PATCH 13/24] bcm-knet: update API for kernel 5.19
 
 Update kernel API usage for 5.18 and 5.19:
 

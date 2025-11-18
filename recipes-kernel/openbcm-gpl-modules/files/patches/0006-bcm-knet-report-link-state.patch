@@ -1,7 +1,7 @@
-From 50bc3b0c3c8087c84535624b8511838b8607d8fe Mon Sep 17 00:00:00 2001
+From 51ab65b7da8c0c7e3bc07ee5b1d1eb1a256061ac Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 7 Feb 2022 12:11:54 +0100
-Subject: [PATCH 06/22] bcm-knet: report link state
+Subject: [PATCH 06/24] bcm-knet: report link state
 
 We set netif carrier, so we can just use ethtool_op_get_link.
 

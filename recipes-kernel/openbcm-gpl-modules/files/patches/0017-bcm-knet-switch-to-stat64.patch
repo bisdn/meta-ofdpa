@@ -1,7 +1,7 @@
-From b0512e127bb503cb52d3eeefc03ea78f5151e682 Mon Sep 17 00:00:00 2001
+From 406c9e3d085759def362964ee5f7279ab79950c0 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 14 May 2025 10:48:41 +0200
-Subject: [PATCH 17/22] bcm-knet: switch to stat64
+Subject: [PATCH 17/24] bcm-knet: switch to stat64
 
 In preparation to report accurate counts, switch to stat64. This has no
 effect on 64 bit, but for 32 bit this switches to 64 bit counters. Since

@@ -1,7 +1,7 @@
-From ab8b2cee520fa95fcea036115221cac201e1ae79 Mon Sep 17 00:00:00 2001
+From 4219a47098b0ad66432f17726af511c06e4c4d85 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 14 May 2025 15:47:49 +0200
-Subject: [PATCH 16/22] bcm-knet: fix reported tx bytes
+Subject: [PATCH 16/24] bcm-knet: fix reported tx bytes
 
 Do not include FCS and custom data header in tx byte counts. The custom
 header is never transmitted on the wire and consumed by the ASIC, so we

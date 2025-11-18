@@ -1,7 +1,7 @@
-From 927503cbc4e0859bcda1f0c6964bffe5ec41a904 Mon Sep 17 00:00:00 2001
+From 0083d64b5170fd463e65a559584c7f274e0ca0db Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:55:39 +0100
-Subject: [PATCH 01/22] gmodule: update proc code for linux 5.6+
+Subject: [PATCH 01/24] gmodule: update proc code for linux 5.6+
 
 ---
  .../systems/linux/kernel/modules/shared/gmodule.c      | 10 ++++++++++

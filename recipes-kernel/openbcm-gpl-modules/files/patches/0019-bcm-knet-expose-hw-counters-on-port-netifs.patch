@@ -1,7 +1,7 @@
-From 4b8499b20a4d1153e1ec1ef0bef7a236d4dee647 Mon Sep 17 00:00:00 2001
+From 2d976703d2043381fd6187998d03c71b714204cf Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Thu, 15 May 2025 11:56:06 +0200
-Subject: [PATCH 19/22] bcm-knet: expose hw counters on port netifs
+Subject: [PATCH 19/24] bcm-knet: expose hw counters on port netifs
 
 Now that we can we have a message for updating hw counters on netifs,
 handle in in the kernel driver and expose them as regular stats on port
