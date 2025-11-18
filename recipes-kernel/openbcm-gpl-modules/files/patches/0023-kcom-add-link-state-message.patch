@@ -1,0 +1,85 @@
+From 558b596f4871555997c73a8bfacb9a07bfa5f1b3 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Mon, 10 Nov 2025 10:59:28 +0100
+Subject: [PATCH 23/24] kcom: add link state message
+
+Add a message for SDK to send link state to KNET interfaces.
+
+For now only support the basic attributes: link, speed, and duplex.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.24/include/kcom.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/sdk-6.5.24/include/kcom.h b/sdk-6.5.24/include/kcom.h
+index 07a0618154ac..b3b789b3e19f 100755
+--- a/sdk-6.5.24/include/kcom.h
++++ b/sdk-6.5.24/include/kcom.h
+@@ -51,6 +51,7 @@
+ #define KCOM_VERSION            13 /* Protocol version */
+ 
+ #define KCOM_M_NETIF_STATS	128 /* Netif stats */
++#define KCOM_M_NETIF_STATE      129 /* Netif link state */
+ 
+ /*
+  * Message status codes
+@@ -99,6 +100,9 @@ typedef struct kcom_msg_hdr_s {
+  *  KCOM_NETIF_F_RCPU_ENCAP
+  *  Use RCPU encapsulation for packets that enter and exit this
+  *  interface.
++ *
++ *  KCOM_NETIF_F_SDK_STATE
++ *  BISDN Extension: Link state is updated by SDK.
+  */
+ #define KCOM_NETIF_T_VLAN       0
+ #define KCOM_NETIF_T_PORT       1
+@@ -109,6 +113,8 @@ typedef struct kcom_msg_hdr_s {
+ /* If a netif has this flag, the packet sent to the netif can't be stripped tag or added tag */
+ #define KCOM_NETIF_F_KEEP_RX_TAG (1U << 2)
+ 
++#define KCOM_NETIF_F_SDK_STATE  (1U << 7)
++
+ #define KCOM_NETIF_NAME_MAX     16
+ 
+ /*
+@@ -369,6 +375,13 @@ typedef struct kcom_netif_stats_s {
+     uint64 dot3_late_collisions;
+ } kcom_netif_stats_t;
+ 
++typedef struct kcom_netif_state_s {
++    uint8 port;
++    uint8 link;
++    uint8 duplex;
++    uint32 speed;
++} kcom_netif_state_t;
++
+ /*
+  * Send literal string to/from kernel module.
+  * Mainly for debugging purposes.
+@@ -585,6 +598,14 @@ typedef struct kcom_msg_netif_stats_s {
+     kcom_netif_stats_t netif_stats;
+ } kcom_msg_netif_stats_t;
+ 
++/*
++ * Netif link state
++ */
++typedef struct kcom_msg_netif_state_s {
++    kcom_msg_hdr_t hdr;
++    kcom_netif_state_t netif_state;
++} kcom_msg_netif_state_t;
++
+ /*
+  * All messages (e.g. for generic receive)
+  */
+@@ -612,6 +633,7 @@ typedef union kcom_msg_s {
+     kcom_msg_wb_cleanup_t wb_cleanup;
+     kcom_msg_clock_cmd_t clock_cmd;
+     kcom_msg_netif_stats_t netif_stats;
++    kcom_msg_netif_state_t netif_state;
+ } kcom_msg_t;
+ 
+ /*
+-- 
+2.51.0
+

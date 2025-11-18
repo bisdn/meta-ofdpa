@@ -1,7 +1,7 @@
-From af29b8cf9d0f64af03b8434b3c5a078d4dc72acc Mon Sep 17 00:00:00 2001
+From 92db249f579e8544e47a4ef3fdb31e595d2cea2f Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 6 May 2024 11:25:49 +0200
-Subject: [PATCH 15/22] bcm-knet: extract and update DSCP for IP packets
+Subject: [PATCH 15/24] bcm-knet: extract and update DSCP for IP packets
 
 For currently unknown reasons the Broadcom ASIC does not update the DSCP
 field for packets sent to controller. But the DMA header does have the

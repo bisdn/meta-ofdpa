@@ -1,7 +1,7 @@
-From 8eab43105606c6df887586de8f5149049c3ffbf4 Mon Sep 17 00:00:00 2001
+From 79079d55b6f8cca9ce410bf52f3598e0a8b134a0 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 25 Apr 2022 10:48:26 +0200
-Subject: [PATCH 10/22] bcm-knet: use fully randomized mac addresses
+Subject: [PATCH 10/24] bcm-knet: use fully randomized mac addresses
 
 Instead of using partially randomized mac addresses with a Broadcom OUI
 prefix, use fully randomized mac addresses for generated virtualized

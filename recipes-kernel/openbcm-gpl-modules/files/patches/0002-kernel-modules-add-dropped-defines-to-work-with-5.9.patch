@@ -1,7 +1,7 @@
-From f232ce3b07ba1de9ca50931fedf07bb7c8762824 Mon Sep 17 00:00:00 2001
+From ae64dfab1ee3aad9136c81577f9cc61fc6ced45d Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 16:02:44 +0100
-Subject: [PATCH 02/22] kernel-modules: add dropped defines to work with 5.9+
+Subject: [PATCH 02/24] kernel-modules: add dropped defines to work with 5.9+
 
 Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
 ---

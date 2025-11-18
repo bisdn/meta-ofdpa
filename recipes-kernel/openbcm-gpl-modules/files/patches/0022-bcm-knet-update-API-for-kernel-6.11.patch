@@ -1,7 +1,7 @@
-From f8122b2a2e85acf5011ab4f53d43fe45f6cd9cb9 Mon Sep 17 00:00:00 2001
+From c2e055559ded2fdd51c15a6deb4367c2a1010bfd Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Tue, 18 Feb 2025 16:21:12 +0100
-Subject: [PATCH 22/22] bcm-knet: update API for kernel 6.11
+Subject: [PATCH 22/24] bcm-knet: update API for kernel 6.11
 
 Update kernel API usage for kernel 6.11:
 

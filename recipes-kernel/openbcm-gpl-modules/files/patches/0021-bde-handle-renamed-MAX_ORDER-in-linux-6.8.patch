@@ -1,9 +1,11 @@
-From 1d5458396a64f496418dfa5c5f5df2118b220368 Mon Sep 17 00:00:00 2001
+From 1e9d8d144f76193c4036fc2d00f1350b718d9194 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Tue, 18 Feb 2025 21:42:31 +0100
-Subject: [PATCH 21/22] bde: handle renamed MAX_ORDER in linux 6.8+
+Subject: [PATCH 21/24] bde: handle renamed MAX_ORDER in linux 6.8+
 
 MAX_ORDER was redefined and renamed as MAX_PAGE_ORDER in 6.8
+
+23baf831a32c04f9a968812511540b1b3e648bf5
 
 Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
 ---
