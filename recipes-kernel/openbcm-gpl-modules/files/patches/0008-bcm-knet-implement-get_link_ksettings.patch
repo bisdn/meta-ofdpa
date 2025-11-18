@@ -1,7 +1,7 @@
-From 744e865db52e90818cf4b67cee8edb59946ca828 Mon Sep 17 00:00:00 2001
+From bff0e5ba2b2ace8ddae4c6273a2249967b18829d Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 7 Feb 2022 14:35:49 +0100
-Subject: [PATCH 08/22] bcm-knet: implement get_link_ksettings
+Subject: [PATCH 08/24] bcm-knet: implement get_link_ksettings
 
 To allow programs like ethtool access to the link speed, implement the
 get_link_ksettings callback.
