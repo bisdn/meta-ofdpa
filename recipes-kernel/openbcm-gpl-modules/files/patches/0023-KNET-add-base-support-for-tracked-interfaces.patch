@@ -1,0 +1,111 @@
+From e77087b7a9e9f15c78fc6f65dc76b8ad1dc9d921 Mon Sep 17 00:00:00 2001
+From: Jonas Gorski <jonas.gorski@bisdn.de>
+Date: Tue, 2 Dec 2025 11:08:38 +0100
+Subject: [PATCH 23/24] KNET: add base support for tracked interfaces
+
+Add base support for tracked interfaces. Tracked interfaces fully
+represent switch ports, with tracked configuration and state.
+
+Since KNET allows multiple netifs for the same port, add a restriction
+for tracked interfaces that they only may be one per port.
+
+This also allows us storing a port -> netif lookup table.
+
+Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+---
+ sdk-6.5.24/include/kcom.h                     |  5 ++++
+ .../linux/kernel/modules/bcm-knet/bcm-knet.c  | 27 +++++++++++++++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/sdk-6.5.24/include/kcom.h b/sdk-6.5.24/include/kcom.h
+index 07a0618154ac..1dfabc613644 100755
+--- a/sdk-6.5.24/include/kcom.h
++++ b/sdk-6.5.24/include/kcom.h
+@@ -99,6 +99,9 @@ typedef struct kcom_msg_hdr_s {
+  *  KCOM_NETIF_F_RCPU_ENCAP
+  *  Use RCPU encapsulation for packets that enter and exit this
+  *  interface.
++ *
++ *  KCOM_NETIF_F_TRACKED
++ *  BISDN extension: Port's configuration and state will be kept in sync with SDK.
+  */
+ #define KCOM_NETIF_T_VLAN       0
+ #define KCOM_NETIF_T_PORT       1
+@@ -109,6 +112,8 @@ typedef struct kcom_msg_hdr_s {
+ /* If a netif has this flag, the packet sent to the netif can't be stripped tag or added tag */
+ #define KCOM_NETIF_F_KEEP_RX_TAG (1U << 2)
+ 
++#define KCOM_NETIF_F_TRACKED     (1U << 7)
++
+ #define KCOM_NETIF_NAME_MAX     16
+ 
+ /*
+diff --git a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+index 429022b05f38..9d84b6b67759 100755
+--- a/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
++++ b/sdk-6.5.24/systems/linux/kernel/modules/bcm-knet/bcm-knet.c
+@@ -697,6 +697,8 @@ typedef struct bkn_switch_info_s {
+         uint32_t pkts_d_no_link;    /* Rx drop - software link down */
+         uint32_t pkts_d_no_api_buf; /* Rx drop - no API buffers */
+     } rx[NUM_RX_CHAN];
++
++    void *netifs[KCOM_NETIF_MAX];
+ } bkn_switch_info_t;
+ 
+ #define INVALID_INSTANCE_ID         BDE_DEV_INST_ID_INVALID
+@@ -8924,6 +8926,13 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+         return sizeof(kcom_msg_hdr_t);
+     }
+ 
++    if (kmsg->netif.flags & KCOM_NETIF_F_TRACKED) {
++        if (kmsg->netif.type != KCOM_NETIF_T_PORT) {
++            kmsg->hdr.status = KCOM_E_PARAM;
++            return sizeof(kcom_msg_hdr_t);
++        }
++    }
++
+     if ((dev = bkn_init_ndev(kmsg->netif.macaddr, kmsg->netif.name)) == NULL) {
+         kmsg->hdr.status = KCOM_E_RESOURCE;
+         return sizeof(kcom_msg_hdr_t);
+@@ -8969,6 +8978,17 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+ 
+     spin_lock_irqsave(&sinfo->lock, flags);
+ 
++    if (priv->flags & KCOM_NETIF_F_TRACKED) {
++        if (sinfo->netifs[priv->port] != NULL) {
++            spin_unlock_irqrestore(&sinfo->lock, flags);
++            DBG_WARN(("Tracked device for port %i already exists.\n", priv->port));
++            free_netdev(dev);
++            kmsg->hdr.status = KCOM_E_RESOURCE;
++            return sizeof(kcom_msg_hdr_t);
++        }
++        sinfo->netifs[priv->port] = priv;
++    }
++
+     /*
+      * We insert network interfaces sorted by ID.
+      * In case an interface is destroyed, we reuse the ID
+@@ -9025,6 +9045,9 @@ bkn_knet_netif_create(kcom_msg_netif_create_t *kmsg, int len)
+         spin_lock_irqsave(&sinfo->lock, flags);
+         list_del(&priv->list);
+         sinfo->ndevs[id] = NULL;
++        if (priv->flags & KCOM_NETIF_F_TRACKED) {
++            sinfo->netifs[priv->port] = NULL;
++        }
+         spin_unlock_irqrestore(&sinfo->lock, flags);
+         free_netdev(dev);
+         kmsg->hdr.status = KCOM_E_RESOURCE;
+@@ -9087,6 +9110,10 @@ bkn_knet_netif_destroy(kcom_msg_netif_destroy_t *kmsg, int len)
+         sinfo->ndevs[priv->id] = NULL;
+     }
+ 
++    if (priv->flags & KCOM_NETIF_F_TRACKED) {
++        sinfo->netifs[priv->port] = NULL;
++    }
++
+     cfg_api_unlock(sinfo, &flags);
+ 
+     dev = priv->dev;
+-- 
+2.52.0
+
