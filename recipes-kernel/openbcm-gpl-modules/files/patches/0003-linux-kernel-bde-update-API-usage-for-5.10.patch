@@ -1,7 +1,7 @@
-From 3b7a997fd77dc63fdff25736983edbc27ffbb7c3 Mon Sep 17 00:00:00 2001
+From 94cb5fc4360b6e3aca4c6a490640f1ee15240aa9 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:54:54 +0100
-Subject: [PATCH 03/22] linux-kernel-bde: update API usage for 5.10
+Subject: [PATCH 03/24] linux-kernel-bde: update API usage for 5.10
 
 ---
  sdk-6.5.24/systems/bde/linux/include/linux_dma.h          | 2 +-

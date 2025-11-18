@@ -1,7 +1,7 @@
-From f8b935742160a4ae6f532138c04df17b4a4bef57 Mon Sep 17 00:00:00 2001
+From 2c1ab1dab25abd202b87d72d08243998e19e6d29 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 21 Nov 2022 12:01:36 +0100
-Subject: [PATCH 14/22] linux-kernel-bde: use platform_get_irq()
+Subject: [PATCH 14/24] linux-kernel-bde: use platform_get_irq()
 
 The Kernel stopped providing platform resources for IRQs of device tree
 backed platform devices[1], and instead requires calling
