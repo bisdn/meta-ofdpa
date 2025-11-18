@@ -1,7 +1,7 @@
-From 6bdeca9e704ff4a48318601f2a48ad589ef9dbbf Mon Sep 17 00:00:00 2001
+From 48d8279f21ec06ba55ee63ea78dc560f8ec7b0bb Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 23 Apr 2025 14:37:20 +0200
-Subject: [PATCH 20/20] bcm-knet: do not mark BPDU packets as offloaded
+Subject: [PATCH 20/22] bcm-knet: do not mark BPDU packets as offloaded
 
 BPDU packets are trapped to controller and never forwarded, so do not
 mark them as offloaded. This allows them to be forwarded/flooded in
@@ -84,5 +84,5 @@ index 6da8262aeca0..e3728c73a7d7 100755
                      if (mirror_local) {
                          if (mskb) {
 -- 
-2.50.1
+2.51.0
 

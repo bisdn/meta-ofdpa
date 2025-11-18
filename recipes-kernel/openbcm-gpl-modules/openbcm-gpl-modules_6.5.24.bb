@@ -32,6 +32,8 @@ SRC_URI = " \
           file://patches/0018-kcom-add-a-message-for-pushing-hw-counters-to-netifs.patch;striplevel=2 \
           file://patches/0019-bcm-knet-expose-hw-counters-on-port-netifs.patch;striplevel=2 \
           file://patches/0020-bcm-knet-do-not-mark-BPDU-packets-as-offloaded.patch;striplevel=2 \
+          file://patches/0021-bde-handle-renamed-MAX_ORDER-in-linux-6.8.patch;striplevel=2 \
+          file://patches/0022-bcm-knet-update-API-for-kernel-6.11.patch;striplevel=2 \
           "
 
 SRC_URI:append:agema-ag7648 = " \
