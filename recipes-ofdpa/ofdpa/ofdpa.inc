@@ -21,9 +21,6 @@ inherit bin_package
 # for some reason ipk doesn't trigger xz-native as a dependency
 do_unpack[depends] += " xz-native:do_populate_sysroot"
 
-# fails because no license file in the ipk
-deltask do_populate_lic
-
 # systemd.class will append to existing presets, so remove them to avoid
 # duplicating their contents.
 do_install:append() {
