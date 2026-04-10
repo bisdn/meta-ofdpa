@@ -1,4 +1,4 @@
-From 970eb9faf4d877e95a0cecc83fa35dc938fd7d8a Mon Sep 17 00:00:00 2001
+From 0f99674ac8e76f4592afe300b7c838198d9c91e3 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 26 Sep 2022 10:34:45 +0200
 Subject: [PATCH 11/24] bcm-knet: allow marking packets as offloaded
@@ -95,5 +95,5 @@ index 329f1066a511..dd36bd125865 100755
                      gprintk("Warning: unknown link state setting: '%s'\n", ptr);
                  }
 -- 
-2.51.0
+2.53.0
 

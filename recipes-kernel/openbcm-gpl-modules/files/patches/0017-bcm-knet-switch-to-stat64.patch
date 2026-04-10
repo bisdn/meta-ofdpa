@@ -1,4 +1,4 @@
-From 406c9e3d085759def362964ee5f7279ab79950c0 Mon Sep 17 00:00:00 2001
+From c05b3cacec0fdc58f22499588935198c02d8495f Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 14 May 2025 10:48:41 +0200
 Subject: [PATCH 17/24] bcm-knet: switch to stat64
@@ -391,5 +391,5 @@ index 0dac8ec479d9..0c2b6c5fa65b 100755
  
      DBG_VERB(("Created Ethernet device %s.\n", dev->name));
 -- 
-2.51.0
+2.53.0
 

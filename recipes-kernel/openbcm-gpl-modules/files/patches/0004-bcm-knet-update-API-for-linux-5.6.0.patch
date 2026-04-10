@@ -1,4 +1,4 @@
-From fc3227578b65ea8bb826d61f063d9382848e936b Mon Sep 17 00:00:00 2001
+From fe4b34746d1937a14e2ad995f60d852674bca706 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 18 Nov 2022 16:12:08 +0100
 Subject: [PATCH 04/24] bcm-knet: update API for linux 5.6.0
@@ -181,5 +181,5 @@ index 025c6d759840..b701c38c2027 100755
  static int
  bkn_proc_init(void)
 -- 
-2.51.0
+2.53.0
 

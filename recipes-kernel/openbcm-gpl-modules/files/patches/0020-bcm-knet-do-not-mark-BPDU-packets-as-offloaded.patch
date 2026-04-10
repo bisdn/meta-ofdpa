@@ -1,4 +1,4 @@
-From f5fcfa873b4411f006da3245fa65ef3158f361b6 Mon Sep 17 00:00:00 2001
+From 11d6fa6e5acf3d94402a4210438c650d5d5c7b96 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 23 Apr 2025 14:37:20 +0200
 Subject: [PATCH 20/24] bcm-knet: do not mark BPDU packets as offloaded
@@ -84,5 +84,5 @@ index 6da8262aeca0..e3728c73a7d7 100755
                      if (mirror_local) {
                          if (mskb) {
 -- 
-2.51.0
+2.53.0
 

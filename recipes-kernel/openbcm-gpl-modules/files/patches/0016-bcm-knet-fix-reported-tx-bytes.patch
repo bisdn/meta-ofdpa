@@ -1,4 +1,4 @@
-From 4219a47098b0ad66432f17726af511c06e4c4d85 Mon Sep 17 00:00:00 2001
+From 3cd4417b7cd64d9c7906da27fb25564d4c318183 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 14 May 2025 15:47:49 +0200
 Subject: [PATCH 16/24] bcm-knet: fix reported tx bytes
@@ -29,5 +29,5 @@ index 7834cdb29852..0dac8ec479d9 100755
      } else {
          DBG_VERB(("Tx busy: No DMA resources\n"));
 -- 
-2.51.0
+2.53.0
 

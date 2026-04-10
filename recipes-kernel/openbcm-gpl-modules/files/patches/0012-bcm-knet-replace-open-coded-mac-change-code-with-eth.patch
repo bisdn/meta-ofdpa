@@ -1,4 +1,4 @@
-From d08e3925c7cae121890b8710c86e43b4dc1454d2 Mon Sep 17 00:00:00 2001
+From 7e0f497372c9effb46a6e291bd9149904543f52d Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Fri, 18 Nov 2022 16:24:41 +0100
 Subject: [PATCH 12/24] bcm-knet: replace open coded mac change code with
@@ -60,5 +60,5 @@ index dd36bd125865..3abacd4a1f1e 100755
      dev->open = bkn_open;
      dev->hard_start_xmit = bkn_tx;
 -- 
-2.51.0
+2.53.0
 

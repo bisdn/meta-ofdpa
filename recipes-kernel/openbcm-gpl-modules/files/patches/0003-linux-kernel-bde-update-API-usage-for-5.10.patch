@@ -1,4 +1,4 @@
-From 94cb5fc4360b6e3aca4c6a490640f1ee15240aa9 Mon Sep 17 00:00:00 2001
+From 20f345f772708364dca2a2c305416638cb31d5b9 Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:54:54 +0100
 Subject: [PATCH 03/24] linux-kernel-bde: update API usage for 5.10
@@ -58,5 +58,5 @@ index 7628fd92c414..141bd53dade6 100644
  #define HX5_IHOST_GICD_ISENABLERN_0        (0x10781100)
  #define HX5_IHOST_GICD_ISENABLERN_1        (0x10781104)
 -- 
-2.51.0
+2.53.0
 

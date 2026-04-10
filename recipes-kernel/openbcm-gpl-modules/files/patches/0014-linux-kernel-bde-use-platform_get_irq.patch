@@ -1,4 +1,4 @@
-From 2c1ab1dab25abd202b87d72d08243998e19e6d29 Mon Sep 17 00:00:00 2001
+From fdb9c78425bef4e9113c5eefe484df6ca6a732bf Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 21 Nov 2022 12:01:36 +0100
 Subject: [PATCH 14/24] linux-kernel-bde: use platform_get_irq()
@@ -41,5 +41,5 @@ index 1c778e5be06b..65d2b1aee410 100644
  
      ctrl->isr = NULL;
 -- 
-2.51.0
+2.53.0
 
