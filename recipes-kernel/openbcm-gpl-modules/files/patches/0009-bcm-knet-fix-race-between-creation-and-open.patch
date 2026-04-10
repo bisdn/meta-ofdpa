@@ -1,4 +1,4 @@
-From 52c44e080376c540c88c6a8e3f805a66c793f904 Mon Sep 17 00:00:00 2001
+From 1ddea5c9ffdb583b62462d388134f4235c9b7d9f Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Wed, 20 Apr 2022 16:35:24 +0200
 Subject: [PATCH 09/24] bcm-knet: fix race between creation and open
@@ -89,5 +89,5 @@ index 681328485583..9b347a6fe928 100755
          netif_napi_add(dev, &sinfo->napi, bkn_poll, napi_weight);
      }
 -- 
-2.51.0
+2.53.0
 

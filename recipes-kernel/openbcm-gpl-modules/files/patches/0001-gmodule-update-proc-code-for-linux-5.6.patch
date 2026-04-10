@@ -1,4 +1,4 @@
-From 0083d64b5170fd463e65a559584c7f274e0ca0db Mon Sep 17 00:00:00 2001
+From 6743ef214a373e7839b3371c03b21e8320e3984b Mon Sep 17 00:00:00 2001
 From: Jonas Gorski <jonas.gorski@bisdn.de>
 Date: Mon, 14 Dec 2020 15:55:39 +0100
 Subject: [PATCH 01/24] gmodule: update proc code for linux 5.6+
@@ -36,5 +36,5 @@ index 0635b811ed8e..55a9ffc6c350 100644
  int
  gmodule_vpprintf(char** page_ptr, const char* fmt, va_list args)
 -- 
-2.51.0
+2.53.0
 
