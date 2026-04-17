@@ -1,7 +1,7 @@
-ccflags-y			+= -I$(src)/include
-ccflags-y			+= -I$(src)/systems/bde/linux/include
-ccflags-y			+= -I$(src)/systems/bde/shared/include
-ccflags-y			+= -I$(src)/systems/linux/kernel/modules/include
+ccflags-y			+= -I$(src)/sdk-$(SDK_VERSION)/include
+ccflags-y			+= -I$(src)/sdk-$(SDK_VERSION)/systems/bde/linux/include
+ccflags-y			+= -I$(src)/sdk-$(SDK_VERSION)/systems/bde/shared/include
+ccflags-y			+= -I$(src)/sdk-$(SDK_VERSION)/systems/linux/kernel/modules/include
 
 ccflags-$(CONFIG_X86)		+= -DSAL_BDE_DMA_MEM_DEFAULT=32
 ccflags-$(CONFIG_ARM)		+= -DSAL_BDE_DMA_MEM_DEFAULT=16 -DIPROC_CMICD
@@ -16,22 +16,22 @@ endif
 
 ccflags-y			+= -DINCLUDE_KNET=1
 
-SHARED_OBJS			:= systems/bde/linux/shared/mpool.o \
-				   systems/linux/kernel/modules/shared/gmodule.o
+SHARED_OBJS			:= sdk-$(SDK_VERSION)/systems/bde/linux/shared/mpool.o \
+				   sdk-$(SDK_VERSION)/systems/linux/kernel/modules/shared/gmodule.o
 
 linux-kernel-bde-y		:= $(SHARED_OBJS)
-linux-kernel-bde-y		+= systems/bde/linux/kernel/linux-kernel-bde.o
-linux-kernel-bde-y		+= systems/bde/linux/kernel/linux_dma.o
-linux-kernel-bde-y		+= systems/bde/linux/kernel/linux_shbde.o
-linux-kernel-bde-y		+= systems/bde/shared/shbde_iproc.o
-linux-kernel-bde-y		+= systems/bde/shared/shbde_mdio.o
-linux-kernel-bde-y		+= systems/bde/shared/shbde_pci.o
+linux-kernel-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/linux/kernel/linux-kernel-bde.o
+linux-kernel-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/linux/kernel/linux_dma.o
+linux-kernel-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/linux/kernel/linux_shbde.o
+linux-kernel-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/shared/shbde_iproc.o
+linux-kernel-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/shared/shbde_mdio.o
+linux-kernel-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/shared/shbde_pci.o
 
 linux-user-bde-y		:= $(SHARED_OBJS)
-linux-user-bde-y		+= systems/bde/linux/user/kernel/linux-user-bde.o
+linux-user-bde-y		+= sdk-$(SDK_VERSION)/systems/bde/linux/user/kernel/linux-user-bde.o
 
 linux-bcm-knet-y		:= $(SHARED_OBJS)
-linux-bcm-knet-y		+= systems/linux/kernel/modules/bcm-knet/bcm-knet.o
+linux-bcm-knet-y		+= sdk-$(SDK_VERSION)/systems/linux/kernel/modules/bcm-knet/bcm-knet.o
 
 obj-m				:= linux-bcm-knet.o linux-kernel-bde.o linux-user-bde.o
 
