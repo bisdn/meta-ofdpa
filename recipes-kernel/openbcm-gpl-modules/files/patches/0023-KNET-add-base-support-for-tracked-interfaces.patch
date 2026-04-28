@@ -49,7 +49,7 @@ index 429022b05f38..9d84b6b67759 100755
          uint32_t pkts_d_no_api_buf; /* Rx drop - no API buffers */
      } rx[NUM_RX_CHAN];
 +
-+    void *netifs[KCOM_NETIF_MAX];
++    void *netifs[256];
  } bkn_switch_info_t;
  
  #define INVALID_INSTANCE_ID         BDE_DEV_INST_ID_INVALID
