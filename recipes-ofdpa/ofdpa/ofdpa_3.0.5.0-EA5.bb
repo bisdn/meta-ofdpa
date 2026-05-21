@@ -3,7 +3,7 @@ LICENSE = "CLOSED"
 
 PR = "r1"
 SDK_VERSION = "6.5.24"
-SRCREV = "2d95941db1295ad361868b5be0e5b75fb3e78a54"
+SRCREV = "1436dcbdbbe41fb1aee27bfc1470e2cc32ff02d6"
 
 inherit systemd python3-dir
 
