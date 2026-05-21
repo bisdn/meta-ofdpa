@@ -6,40 +6,16 @@ LIC_FILES_CHKSUM = " \
 
 inherit module
 
-SRCREV = "6d2330ce1b4fc49d681cffcf09af408661be4c62"
+SRCREV = "411cd68a2b34a8ce4253a28e1c2ce7d72c887ff7"
 
 SDK_VERSION = "6.5.24"
 PV:append = "+"
 
 SRC_URI = " \
-          git://github.com/bisdn/OpenBCM.git;protocol=https;branch=master \
+          git://github.com/bisdn/OpenBCM.git;protocol=https;branch=bisdn/main \
           file://Makefile;subdir=git \
           file://bisdn-bcm-dev.sh \
           file://bisdn-bcm-dev.rules \
-          file://patches/0001-gmodule-update-proc-code-for-linux-5.6.patch \
-          file://patches/0002-kernel-modules-add-dropped-defines-to-work-with-5.9.patch \
-          file://patches/0003-linux-kernel-bde-update-API-usage-for-5.10.patch \
-          file://patches/0004-bcm-knet-update-API-for-linux-5.6.0.patch \
-          file://patches/0005-bcm-knet-strip-vlan-tag-if-received-untagged-at-port.patch \
-          file://patches/0006-bcm-knet-report-link-state.patch \
-          file://patches/0007-bcm-knet-allow-setting-speed-duplex.patch \
-          file://patches/0008-bcm-knet-implement-get_link_ksettings.patch \
-          file://patches/0009-bcm-knet-fix-race-between-creation-and-open.patch \
-          file://patches/0010-bcm-knet-use-fully-randomized-mac-addresses.patch \
-          file://patches/0011-bcm-knet-allow-marking-packets-as-offloaded.patch \
-          file://patches/0012-bcm-knet-replace-open-coded-mac-change-code-with-eth.patch \
-          file://patches/0013-bcm-knet-update-API-for-kernel-5.19.patch \
-          file://patches/0014-linux-kernel-bde-use-platform_get_irq.patch \
-          file://patches/0015-bcm-knet-extract-and-update-DSCP-for-IP-packets.patch \
-          file://patches/0016-bcm-knet-fix-reported-tx-bytes.patch \
-          file://patches/0017-bcm-knet-switch-to-stat64.patch \
-          file://patches/0018-kcom-add-a-message-for-pushing-hw-counters-to-netifs.patch \
-          file://patches/0019-bcm-knet-expose-hw-counters-on-port-netifs.patch \
-          file://patches/0020-bcm-knet-do-not-mark-BPDU-packets-as-offloaded.patch \
-          file://patches/0021-bde-handle-renamed-MAX_ORDER-in-linux-6.8.patch \
-          file://patches/0022-bcm-knet-update-API-for-kernel-6.11.patch \
-          file://patches/0023-KNET-add-base-support-for-tracked-interfaces.patch \
-          file://patches/0024-KNET-update-link-state-of-tracked-interfaces.patch \
           "
 
 SRC_URI:append:agema-ag7648 = " \
