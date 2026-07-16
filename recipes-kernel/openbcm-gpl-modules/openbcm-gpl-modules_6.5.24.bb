@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = " \
 
 inherit module
 
-SRCREV = "e0e11d713465ed49a4ce3f3bec4a7b8c09e46616"
+SRCREV = "9f5cceeaf2474859a805e832852e287c5ab50ae5"
 
 SDK_VERSION = "6.5.24"
 PV:append = "+"
