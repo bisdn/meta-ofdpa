@@ -2,7 +2,7 @@
 BB_STRICT_CHECKSUM = "0"
 
 SRC_URI = " \
- ${FEEDDOMAIN}/${FEEDURIPREFIX}/ipk/${PACKAGE_ARCH}/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
+ http://repo.bisdn.de/pub/testing/5.6.0_vlan_mirror/${BPN}_${@'${PV}'.replace('AUTOINC', '0')}-${PR}_${PACKAGE_ARCH}.ipk;subdir=${P} \
 "
 
 # Manually calculate expanded ${SRCPV} value
