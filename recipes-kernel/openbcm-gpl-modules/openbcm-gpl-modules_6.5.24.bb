@@ -6,13 +6,13 @@ LIC_FILES_CHKSUM = " \
 
 inherit module
 
-SRCREV = "926d3cbf2e6da8a597e233cfb337a33979141e24"
+SRCREV = "b8ab387838902395d74c5e8f14a78619fa637979"
 
 SDK_VERSION = "6.5.24"
 PV:append = "+"
 
 SRC_URI = " \
-          git://github.com/bisdn/OpenBCM.git;protocol=https;branch=bisdn/main \
+          git://github.com/bisdn/OpenBCM.git;protocol=https;branch=jogo_knet_handle_mssing_eeprom \
           file://Makefile;subdir=git \
           file://bisdn-bcm-dev.sh \
           file://bisdn-bcm-dev.rules \
