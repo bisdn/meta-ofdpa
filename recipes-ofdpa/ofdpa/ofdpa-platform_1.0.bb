@@ -15,7 +15,7 @@ SRC_URI = "\
     git://github.com/sonic-net/sonic-buildimage.git;protocol=https;branch=master \
     file://led \
     file://platform \
-    file://LICENSE.Broadcom-OpenBCM;subdir=git/ \
+    file://LICENSE.Broadcom-OpenBCM;subdir=${S} \
 "
 
 inherit allarch
