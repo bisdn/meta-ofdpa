@@ -13,7 +13,7 @@ PV:append = "+"
 
 SRC_URI = " \
           git://github.com/bisdn/OpenBCM.git;protocol=https;branch=bisdn/main \
-          file://Makefile;subdir=git \
+          file://Makefile;subdir=${S} \
           file://bisdn-bcm-dev.sh \
           file://bisdn-bcm-dev.rules \
           "
