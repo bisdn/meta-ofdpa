@@ -18,8 +18,6 @@ SRC_URI = "\
     file://LICENSE.Broadcom-OpenBCM;subdir=git/ \
 "
 
-S = "${UNPACKDIR}/git"
-
 inherit allarch
 
 SONIC_CUSTOM_LEDS = "\

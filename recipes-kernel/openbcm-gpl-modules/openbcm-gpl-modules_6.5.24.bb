@@ -22,8 +22,6 @@ SRC_URI:append:agema-ag7648 = " \
     file://linux_kernel_bde.conf \
 "
 
-S = "${UNPACKDIR}/git"
-
 FILES:${PN} += "\
             ${sbindir}/bisdn-bcm-dev.sh \
             ${sysconfdir}/udev/rules.d/bisdn-bcm-dev.rules \
