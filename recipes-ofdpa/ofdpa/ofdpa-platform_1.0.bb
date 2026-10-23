@@ -18,7 +18,7 @@ SRC_URI = "\
     file://LICENSE.Broadcom-OpenBCM;subdir=git/ \
 "
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 inherit allarch
 
@@ -43,9 +43,9 @@ do_compile() {
 
 do_install() {
         install -d -m0755 ${D}${datadir}/ofdpa/led
-        install -m 0644 ${WORKDIR}/led/*.json ${D}${datadir}/ofdpa/led
+        install -m 0644 ${UNPACKDIR}/led/*.json ${D}${datadir}/ofdpa/led
         install -d -m0755 ${D}${datadir}/ofdpa/platform
-        cp -R ${WORKDIR}/platform/* ${D}${datadir}/ofdpa/platform
+        cp -R ${UNPACKDIR}/platform/* ${D}${datadir}/ofdpa/platform
 
         for sonic_custom_led in ${SONIC_CUSTOM_LEDS}; do
              onl_platform="$(basename ${sonic_custom_led} | tr '_' '-')"

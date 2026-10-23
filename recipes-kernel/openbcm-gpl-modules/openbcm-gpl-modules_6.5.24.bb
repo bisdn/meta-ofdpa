@@ -22,7 +22,7 @@ SRC_URI:append:agema-ag7648 = " \
     file://linux_kernel_bde.conf \
 "
 
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/git"
 
 FILES:${PN} += "\
             ${sbindir}/bisdn-bcm-dev.sh \
@@ -35,17 +35,17 @@ EXTRA_OEMAKE += " SDK_VERSION=${SDK_VERSION}"
 
 do_install:append() {
 	# update path marker in udev rules
-	sed -i -e "s#SBINDIR#${sbindir}#" ${WORKDIR}/bisdn-bcm-dev.rules
+	sed -i -e "s#SBINDIR#${sbindir}#" ${UNPACKDIR}/bisdn-bcm-dev.rules
 
 	install -m 0755 -d ${D}${sbindir} \
 			   ${D}${sysconfdir}/udev/rules.d
-	install -m 0755 ${WORKDIR}/bisdn-bcm-dev.sh    ${D}${sbindir}
-	install -m 0644 ${WORKDIR}/bisdn-bcm-dev.rules ${D}${sysconfdir}/udev/rules.d
+	install -m 0755 ${UNPACKDIR}/bisdn-bcm-dev.sh    ${D}${sbindir}
+	install -m 0644 ${UNPACKDIR}/bisdn-bcm-dev.rules ${D}${sysconfdir}/udev/rules.d
 }
 
 do_install:append:agema-ag7648() {
         install -d ${D}${sysconfdir}/modprobe.d/
-        install -m 0644 ${WORKDIR}/*.conf ${D}${sysconfdir}/modprobe.d/
+        install -m 0644 ${UNPACKDIR}/*.conf ${D}${sysconfdir}/modprobe.d/
 }
 
 KERNEL_MODULE_PROBECONF:append = " linux-kernel-bde"
